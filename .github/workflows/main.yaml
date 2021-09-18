@@ -1,0 +1,65 @@
+# Test & Build
+name: Test & Build
+
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  TestingWithGoversionsMatrix:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        go:
+          - "1.17"
+          - "1.16"
+          - "1.15"
+          - "1.14"
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+
+      - uses: actions/cache@v2
+        if: ${{ !env.ACT }}
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ matrix.golang }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-${{ matrix.golang }}-
+
+      - run: make build
+      - run: make tests
+
+      - name: Install goveralls
+        env: { GO111MODULE: "off" }
+        if: matrix.go == '1.17'
+        run: go get github.com/mattn/goveralls
+
+      - name: Coverage - Sending Report to Coveral
+        if: matrix.go == '1.17'
+        env:
+          COVERALLS_TOKEN: ${{ secrets.github_token }}
+        run: goveralls -coverprofile=coverage.cov -service=github
+
+  GolangCILinter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: latest
+          skip-build-cache: true
+          skip-pkg-cache: true
+          args: -D deadcode
+
