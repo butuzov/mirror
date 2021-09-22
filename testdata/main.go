@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"regexp"
 	. "regexp"
 	reg "regexp"
@@ -16,48 +15,66 @@ type ( // for sake of keeping imports active, while dis/enabling test cases
 func main() {
 	{
 		b1 := "seafood"
-		matched, _ := regexp.Match(`foo.*`, []byte(b1)) // want `Match(String)? can be \((.*)\)`
-		fmt.Printf("regexp - %#v\n", matched)
+		_, _ = regexp.Match(`foo.*`, []byte(b1)) // want `you should be using regexp.MatchString`
 	}
 	{
 		b1 := []byte("seafood")
-		matched, _ := regexp.MatchString(`foo.*`, string(b1)) // want `Match(String)? can be \((.*)\)`
-		fmt.Printf("regexp - %#v\n", matched)
+		_, _ = regexp.MatchString(`foo.*`, string(b1)) // want `you should be using regexp.Match`
 	}
 
 	{
 		foobar := `foobar`
-		matched, _ := Match(`foo.*`, []byte(foobar)) // want `Match(String)? can be \((.*)\)`
-		fmt.Printf("dot import - %#v\n", matched)
+		_, _ = Match(`foo.*`, []byte(foobar)) // want `you should be using regexp.Match`
 	}
 	{
 		foobar := []byte(`foobar`)
-		matched, _ := MatchString(`foo.*`, string(foobar)) // want `Match(String)? can be \((.*)\)`
-		fmt.Printf("dot import - %#v\n", matched)
+		_, _ = MatchString(`foo.*`, string(foobar)) // want `you should be using regexp.Match`
 	}
 
 	{
 		footbal := `football`
-		matched, _ := reg.Match(`foo.*`, []byte(footbal)) // want `Match(String)? can be \((.*)\)`
-		fmt.Printf("named - %#v\n", matched)
+		_, _ = reg.Match(`foo.*`, []byte(footbal)) // want `you should be using regexp.MatchString`
 	}
 	{
 		footbal := []byte(`football`)
-		matched, _ := reg.MatchString(`foo.*`, string(footbal)) // want `Match(String)? can be \((.*)\)`
-		fmt.Printf("named - %#v\n", matched)
+		_, _ = reg.MatchString(`foo.*`, string(footbal)) // want `you should be using regexp\.Match`
 	}
 
 	{
 		re1, _ := regexp.Compile(`foo.*`)
 		str := "fool"
-		matched := re1.Match([]byte(str)) // want `Match(String)? can be \((.*)\)`
-		fmt.Printf("regexp.Regexp - %#v\n", matched)
+		_ = re1.Match([]byte(str)) // want `you should be using MatchString method`
 	}
 
 	{
 		re1, _ := regexp.Compile(`foo.*`)
 		str := []byte("fool")
-		matched := re1.MatchString(string(str)) // want `Match(String)? can be \((.*)\)`
-		fmt.Printf("regexp.Regexp - %#v\n", matched)
+		_ = re1.MatchString(string(str)) // want `you should be using Match method`
+	}
+
+	{
+		re1, _ := regexp.Compile(`foo.*`)
+		str := "fool"
+		_ = re1.FindAllIndex([]byte(str), -1) // want `you should be using FindAllStringIndex method`
+	}
+
+	{
+		re1, _ := regexp.Compile(`foo.*`)
+		b := []byte("fool")
+		_ = re1.FindAllStringIndex(string(b), -1) // want `you should be using FindAllIndex method`
+	}
+
+	{
+		re1, _ := regexp.Compile(`foo.*`)
+		s1 := "fool"
+		s2 := "bool"
+		_ = re1.ReplaceAll([]byte(s1), []byte(s2))
+	}
+
+	{
+		re1, _ := regexp.Compile(`foo.*`)
+		b1 := []byte("fool")
+		b2 := []byte("bool")
+		_ = re1.ReplaceAllString(string(b1), string(b2))
 	}
 }

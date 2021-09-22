@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/butuzov/mirror/pkg/analyzer"
+	"github.com/butuzov/mirror"
 	"golang.org/x/tools/go/analysis/singlechecker"
 )
 
 func main() {
-	singlechecker.Main(analyzer.NewAnalyzer())
+	singlechecker.Main(mirror.NewAnalyzer())
 }
