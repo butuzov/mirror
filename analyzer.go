@@ -26,6 +26,7 @@ func NewAnalyzer() *analysis.Analyzer {
 		checkers: []checker{
 			&rules.RegexpCheckers{},
 			&rules.StringsCheckers{},
+			&rules.BytesCheckers{},
 		},
 	}
 
