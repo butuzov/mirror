@@ -25,6 +25,7 @@ func NewAnalyzer() *analysis.Analyzer {
 		imports: map[string][]string{},
 		checkers: []checker{
 			&rules.RegexpCheckers{},
+			&rules.StringsCheckers{},
 		},
 	}
 
