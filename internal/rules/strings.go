@@ -15,24 +15,88 @@ type StringsCheckers struct{}
 
 var (
 	stringFunctions = map[string]Diagnostic{
-		"Compare": {
-			Message: "you should be using bytes.Compare",
+		// "Compare": {
+		// 	Message: "this call can be optimized with bytes.Compare",
+		// 	Args:    []int{0, 1},
+		// },
+		// "Contains": {
+		// 	Message: "this call can be optimized with bytes.Contains",
+		// 	Args:    []int{0, 1},
+		// },
+		"ContainsAny": {
+			Message: "this call can be optimized with bytes.ContainsAny",
+			Args:    []int{0},
+		},
+		"ContainsRune": {
+			Message: "this call can be optimized with bytes.ContainsRune",
+			Args:    []int{0},
+		},
+		"Count": {
+			Message: "this call can be optimized with bytes.Count",
 			Args:    []int{0, 1},
 		},
-		"Contains": {
-			Message: "you should be using bytes.Contains",
+		"EqualFold": {
+			Message: "this call can be optimized with bytes.EqualFold",
 			Args:    []int{0, 1},
+		},
+		"HasPrefix": {
+			Message: "this call can be optimized with bytes.HasPrefix",
+			Args:    []int{0, 1},
+		},
+		"HasSuffix": {
+			Message: "this call can be optimized with bytes.HasSuffix",
+			Args:    []int{0, 1},
+		},
+		"Index": {
+			Message: "this call can be optimized with bytes.Index",
+			Args:    []int{0, 1},
+		},
+		"IndexAny": {
+			Message: "this call can be optimized with bytes.IndexAny",
+			Args:    []int{0},
+		},
+		"IndexByte": {
+			Message: "this call can be optimized with bytes.IndexByte",
+			Args:    []int{0},
+		},
+		"IndexFunc": {
+			Message: "this call can be optimized with bytes.IndexFunc",
+			Args:    []int{0},
+		},
+		"IndexRune": {
+			Message: "this call can be optimized with bytes.IndexRune",
+			Args:    []int{0},
+		},
+		"LastIndex": {
+			Message: "this call can be optimized with bytes.LastIndex",
+			Args:    []int{0, 1},
+		},
+		"LastIndexAny": {
+			Message: "this call can be optimized with bytes.LastIndexAny",
+			Args:    []int{0},
+		},
+		"Runes": {
+			Message: "this call can be optimized with bytes.Runes",
+			Args:    []int{0},
+		},
+		"LastIndexByte": {
+			Message: "this call can be optimized with bytes.LastIndexByte",
+			Args:    []int{0},
+		},
+		"LastIndexFunc": {
+			Message: "this call can be optimized with bytes.LastIndexAny",
+			Args:    []int{0},
 		},
 	}
 
 	// note(butuzov): adding confidiance feature (flag and field) will allow to check other methods.
 	stringsBuilderMethods = map[string]Diagnostic{
 		"Write": {
-			Message: "you should be using WriteString method",
+			Message: "this call can be optimized with WriteString method",
 			Args:    []int{0},
 		},
 		"WriteString": {
-			Message: "you should be using Write method",
+			Message: "this call can be optimized with Write method",
 			Args:    []int{0},
 		}, //
 	}
@@ -53,7 +117,7 @@ func (re *StringsCheckers) Check(ce *ast.CallExpr, ld *data.Data) []analysis.Dia
 		// function (v.Sel.Name) Match(String)? on imported package `regexp` (x.Name)
 		if d, ok := stringFunctions[v.Sel.Name]; ok && ld.HasImport(`strings`, x.Name) {
 			// proceed with check
-			res := checkStringsExp(d.Args, ce.Args, strings.Contains(v.Sel.Name, `String`))
+			res := isStringCall(d.Args, ce.Args)
 			if len(res) != len(d.Args) {
 				return nil
 			}
@@ -68,7 +132,7 @@ func (re *StringsCheckers) Check(ce *ast.CallExpr, ld *data.Data) []analysis.Dia
 		// method of the regexp.Regexp
 		if d, ok := stringsBuilderMethods[v.Sel.Name]; ok && isStringsBuilderType(ld.Types[v.X]) {
 			// proceed with check
-			res := checkStringsExp(d.Args, ce.Args, strings.Contains(v.Sel.Name, `String`))
+			res := checkRegExp(d.Args, ce.Args, strings.Contains(v.Sel.Name, `String`))
 			if len(res) != len(d.Args) {
 				return nil
 			}
@@ -83,7 +147,7 @@ func (re *StringsCheckers) Check(ce *ast.CallExpr, ld *data.Data) []analysis.Dia
 		// function (v.Sel.Name) Match(String)? on dot imported package `regexp`
 		if d, ok := stringFunctions[v.Name]; ok && ld.HasImport(`strings`, `.`) {
 			// proceed with check
-			res := checkStringsExp(d.Args, ce.Args, strings.Contains(v.Name, `String`))
+			res := isStringCall(d.Args, ce.Args)
 			if len(res) != len(d.Args) {
 				return nil
 			}
@@ -105,47 +169,4 @@ func isStringsBuilderType(tv types.TypeAndValue) bool {
 	s := tv.Type.String()
 
 	return s == "*strings.Builder" || s == "strings.Builder"
-}
-
-// Check will try to find which arguments can be replaced.
-func checkStringsExp(pos []int, args []ast.Expr, isString bool) (matched []int) {
-	for _, i := range pos {
-		call, ok := args[i].(*ast.CallExpr)
-		if !ok {
-			continue
-		}
-
-		switch node := call.Fun.(type) {
-		case *ast.Ident:
-			//
-			// Converting with string()
-			//
-			// todo(butuzov): edge cases
-			// - is it edge case fmt.Sprintf("%s", )
-			//
-			if isString != (node.Name != "string") {
-				matched = append(matched, i)
-				continue
-			}
-		case *ast.ArrayType:
-			//
-			// Converting to the bytes slice with direct convertion []byte
-			//
-			// todo(butuzov): edge cases
-			// - argument suports .Bytes() []byte
-			// - argument is []bytes (unnecessary converstion)
-			//
-			val, ok := node.Elt.(*ast.Ident)
-			if !ok {
-				continue
-			}
-
-			if !isString != (val.Name != "byte") {
-				matched = append(matched, i)
-				continue
-			}
-		}
-	}
-
-	return matched
 }

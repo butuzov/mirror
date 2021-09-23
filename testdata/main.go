@@ -15,53 +15,53 @@ type ( // for sake of keeping imports active, while dis/enabling test cases
 func main() {
 	{
 		b1 := "seafood"
-		_, _ = regexp.Match(`foo.*`, []byte(b1)) // want `you should be using regexp.MatchString`
+		_, _ = regexp.Match(`foo.*`, []byte(b1)) // want `this call can be optimized with regexp\.MatchString`
 	}
 	{
 		b1 := []byte("seafood")
-		_, _ = regexp.MatchString(`foo.*`, string(b1)) // want `you should be using regexp.Match`
+		_, _ = regexp.MatchString(`foo.*`, string(b1)) // want `this call can be optimized with regexp\.Match`
 	}
 
 	{
 		foobar := `foobar`
-		_, _ = Match(`foo.*`, []byte(foobar)) // want `you should be using regexp.Match`
+		_, _ = Match(`foo.*`, []byte(foobar)) // want `this call can be optimized with regexp\.MatchString`
 	}
 	{
 		foobar := []byte(`foobar`)
-		_, _ = MatchString(`foo.*`, string(foobar)) // want `you should be using regexp.Match`
+		_, _ = MatchString(`foo.*`, string(foobar)) // want `this call can be optimized with regexp\.Match`
 	}
 
 	{
 		footbal := `football`
-		_, _ = reg.Match(`foo.*`, []byte(footbal)) // want `you should be using regexp.MatchString`
+		_, _ = reg.Match(`foo.*`, []byte(footbal)) // want `this call can be optimized with regexp\.MatchString`
 	}
 	{
 		footbal := []byte(`football`)
-		_, _ = reg.MatchString(`foo.*`, string(footbal)) // want `you should be using regexp\.Match`
+		_, _ = reg.MatchString(`foo.*`, string(footbal)) // want `this call can be optimized with regexp\.Match`
 	}
 
 	{
 		re1, _ := regexp.Compile(`foo.*`)
 		str := "fool"
-		_ = re1.Match([]byte(str)) // want `you should be using MatchString method`
+		_ = re1.Match([]byte(str)) // want `this call can be optimized with \(\*regexp\.Regexp(.*)\)\.MatchString`
 	}
 
 	{
 		re1, _ := regexp.Compile(`foo.*`)
 		str := []byte("fool")
-		_ = re1.MatchString(string(str)) // want `you should be using Match method`
+		_ = re1.MatchString(string(str)) // want `this call can be optimized with \(\*regexp\.Regexp(.*)\)\.Match`
 	}
 
 	{
 		re1, _ := regexp.Compile(`foo.*`)
 		str := "fool"
-		_ = re1.FindAllIndex([]byte(str), -1) // want `you should be using FindAllStringIndex method`
+		_ = re1.FindAllIndex([]byte(str), -1) // want `this call can be optimized with \(\*regexp\.Regexp(.*)\)\.FindAllStringIndex`
 	}
 
 	{
 		re1, _ := regexp.Compile(`foo.*`)
 		b := []byte("fool")
-		_ = re1.FindAllStringIndex(string(b), -1) // want `you should be using FindAllIndex method`
+		_ = re1.FindAllStringIndex(string(b), -1) // want `this call can be optimized with \(\*regexp\.Regexp(.*)\)\.FindAllIndex`
 	}
 
 	{
