@@ -1,0 +1,7 @@
+	{
+		{{if .PreCond}}{{.PreCond}}{{end}}
+		{{- range $v := .Arguments}}
+		{{$v}}
+		{{- end}}
+		{{.Returns}} = {{if .Package}}{{.Package}}.{{end}}{{.Func}} {{if .Want}}// want `{{.Want}}`{{end}}
+	}

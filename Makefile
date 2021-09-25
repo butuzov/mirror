@@ -17,6 +17,9 @@ tests:
 		-covermode=atomic \
 		-coverpkg=$(GOPKGS) -coverprofile=coverage.cov ./...
 
+generate:
+	go run ./cmd/internal/generate-tests/ "$(PWD)/testdata"
+
 lints:
 	golangci-lint run --no-config ./... -D deadcode
 
