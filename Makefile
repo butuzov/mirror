@@ -21,7 +21,7 @@ generate:
 	go run ./cmd/internal/generate-tests/ "$(PWD)/testdata"
 
 lints:
-	golangci-lint run --no-config ./... -D deadcode
+	golangci-lint run --no-config ./... -D deadcode --skip-dirs "^(cmd|testdata)"
 
 cover:
 	go tool cover -html=coverage.cov

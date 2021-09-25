@@ -50,29 +50,3 @@ func (re *BytesCheckers) Check(ce *ast.CallExpr, ld *data.Data) []analysis.Diagn
 
 	return nil
 }
-
-// Check will try to find which arguments can be replaced.
-func checkBytesExp(pos []int, args []ast.Expr, isString bool) (matched []int) {
-	for _, i := range pos {
-		call, ok := args[i].(*ast.CallExpr)
-		if !ok {
-			continue
-		}
-
-		switch node := call.Fun.(type) {
-		case *ast.ArrayType:
-
-			val, ok := node.Elt.(*ast.Ident)
-			if !ok {
-				continue
-			}
-
-			if !isString != (val.Name != "byte") {
-				matched = append(matched, i)
-				continue
-			}
-		}
-	}
-
-	return matched
-}

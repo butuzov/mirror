@@ -59,5 +59,5 @@ jobs:
           version: latest
           skip-build-cache: true
           skip-pkg-cache: true
-          args: -D deadcode
+          args: -D deadcode --skip-dirs "^(cmd|testdata)"
 
