@@ -3,7 +3,6 @@ package rules
 import (
 	"go/ast"
 	"go/types"
-	"strings"
 
 	"github.com/butuzov/mirror/internal/data"
 	"golang.org/x/tools/go/analysis"
@@ -17,67 +16,6 @@ import (
 // todo(butuzov): detection of something that string(regexp)
 
 type RegexpCheckers struct{}
-
-var (
-	RegexpFunctions = map[string]Diagnostic{
-		"Match": {
-			Message: "this call can be optimized with regexp.MatchString",
-			Args:    []int{1},
-		},
-		"MatchString": {
-			Message: "this call can be optimized with regexp.Match",
-			Args:    []int{1},
-		},
-	}
-
-	// As you see we are not using all of the regexp method because
-	// nes we missing return concrete types (bytes or strings)
-	// which most probably was intentional.
-
-	// note(butuzov): adding confidiance feature (flag and field) will allow to check other methods.
-	RegexpMethods = map[string]Diagnostic{
-		"Match": {
-			Message: "this call can be optimized with (*regexp.Regexp).MatchString",
-			Args:    []int{0},
-		},
-		"MatchString": {
-			Message: "this call can be optimized with (*regexp.Regexp).Match",
-			Args:    []int{0},
-		},
-		"FindAllIndex": {
-			Message: "this call can be optimized with (*regexp.Regexp).FindAllStringIndex",
-			Args:    []int{0},
-		},
-		"FindAllStringIndex": {
-			Message: "this call can be optimized with (*regexp.Regexp).FindAllIndex",
-			Args:    []int{0},
-		},
-		"FindAllSubmatchIndex": {
-			Message: "this call can be optimized with (*regexp.Regexp).FindAllStringSubmatchIndex",
-			Args:    []int{0},
-		}, //
-		"FindAllStringSubmatchIndex": {
-			Message: "this call can be optimized with (*regexp.Regexp).FindAllSubmatchIndex",
-			Args:    []int{0},
-		},
-		"FindIndex": {
-			Message: "this call can be optimized with (*regexp.Regexp).FindStringIndex",
-			Args:    []int{0},
-		},
-		"FindStringIndex": {
-			Message: "this call can be optimized with (*regexp.Regexp).FindStringIndex",
-			Args:    []int{0},
-		},
-		"FindSubmatchIndex": {
-			Message: "this call can be optimized with (*regexp.Regexp).FindStringSubmatchIndex",
-			Args:    []int{0},
-		},
-		"FindStringSubmatchIndex": {
-			Message: "this call can be optimized with (*regexp.Regexp).FindSubmatchIndex",
-			Args:    []int{0},
-		},
-	}
-)
 
 func (re *RegexpCheckers) Check(ce *ast.CallExpr, ld *data.Data) []analysis.Diagnostic {
 	switch v := ce.Fun.(type) {
@@ -94,8 +32,7 @@ func (re *RegexpCheckers) Check(ce *ast.CallExpr, ld *data.Data) []analysis.Diag
 		// function (v.Sel.Name) Match(String)? on imported package `regexp` (x.Name)
 		if d, ok := RegexpFunctions[v.Sel.Name]; ok && ld.HasImport(`regexp`, x.Name) {
 			// proceed with check
-			res := checkRegExp(d.Args, ce.Args, strings.Contains(v.Sel.Name, `String`))
-			if len(res) != len(d.Args) {
+			if res := check(d.Args, ce.Args, d.TargetStrings); len(res) != len(d.Args) {
 				return nil
 			}
 
@@ -107,10 +44,10 @@ func (re *RegexpCheckers) Check(ce *ast.CallExpr, ld *data.Data) []analysis.Diag
 		}
 
 		// method of the regexp.Regexp
-		if d, ok := RegexpMethods[v.Sel.Name]; ok && isRegexpRegexpType(ld.Types[v.X]) {
+		if d, ok := RegexpRegexpMethods[v.Sel.Name]; ok && isRegexpRegexpType(ld.Types[v.X]) {
 			// proceed with check
-			res := checkRegExp(d.Args, ce.Args, strings.Contains(v.Sel.Name, `String`))
-			if len(res) != len(d.Args) {
+
+			if res := check(d.Args, ce.Args, d.TargetStrings); len(res) != len(d.Args) {
 				return nil
 			}
 
@@ -124,8 +61,8 @@ func (re *RegexpCheckers) Check(ce *ast.CallExpr, ld *data.Data) []analysis.Diag
 		// function (v.Sel.Name) Match(String)? on dot imported package `regexp`
 		if d, ok := RegexpFunctions[v.Name]; ok && ld.HasImport(`regexp`, `.`) {
 			// proceed with check
-			res := checkRegExp(d.Args, ce.Args, strings.Contains(v.Name, `String`))
-			if len(res) != len(d.Args) {
+
+			if res := check(d.Args, ce.Args, d.TargetStrings); len(res) != len(d.Args) {
 				return nil
 			}
 

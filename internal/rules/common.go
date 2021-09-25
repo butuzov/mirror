@@ -6,8 +6,13 @@ import (
 )
 
 type Diagnostic struct {
-	Message string
-	Args    []int
+	Message       string
+	Args          []int
+	TargetStrings bool // Is this function/method expected to work with strings?
+
+	GenCondition string // Precondition, if we working with struct (regexpRegexp or strings.Builder)
+	GenPattern   string // Generated Call
+	GenReturns   int    // Placeholder for generated test return results
 }
 
 func isBytesBufferType(tv types.TypeAndValue) bool {
@@ -19,68 +24,8 @@ func isBytesBufferType(tv types.TypeAndValue) bool {
 	return s == "*bytes.Buffer" || s == "bytes.Buffer"
 }
 
-// return positions of args that matching to
-func isBytesArrayCall(pos []int, args []ast.Expr) []int {
-	var out []int
-
-	for _, i := range pos {
-		// todo(butuzov): check incoming variable type, if its variable
-
-		// note(butuzov): checking call expression if its call expression.
-		call, ok := args[i].(*ast.CallExpr)
-		if !ok {
-			continue
-		}
-
-		array, ok := call.Fun.(*ast.ArrayType)
-		if !ok {
-			continue
-		}
-
-		val, ok := array.Elt.(*ast.Ident)
-		if !ok {
-			continue
-		}
-
-		if val.Name != "byte" {
-			continue
-		}
-
-		out = append(out, i)
-	}
-
-	return out
-}
-
-func isStringCall(pos []int, args []ast.Expr) []int {
-	var out []int
-
-	for _, i := range pos {
-		// todo(butuzov): check incoming variable type, if its variable
-
-		// note(butuzov): checking call expression if its call expression.
-		call, ok := args[i].(*ast.CallExpr)
-		if !ok {
-			continue
-		}
-
-		funcName, ok := call.Fun.(*ast.Ident)
-		if !ok {
-			continue
-		}
-
-		if funcName.Name != "string" {
-			continue
-		}
-
-		out = append(out, i)
-	}
-
-	return out
-}
-
 // Check will try to find which arguments can be replaced.
-func checkRegExp(pos []int, args []ast.Expr, isString bool) (matched []int) {
+func check(pos []int, args []ast.Expr, isString bool) (matched []int) {
 	for _, i := range pos {
 		call, ok := args[i].(*ast.CallExpr)
 		if !ok {
