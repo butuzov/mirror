@@ -12,3 +12,10 @@ You can get `mirror` with `go install` command.
 go install github.com/butuzov/mirror/cmd/mirror
 ```
 
+## Usage
+
+```shell
+# include test files reports
+mirror --with-tests ./...
+```
+
