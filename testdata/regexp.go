@@ -17,7 +17,7 @@ var (
 func main_regexp() {
 	{
 		
-		_,_ = regexp.Match("foo", []byte("foobar")) // want `this call can be optimized with regexp\.MatchString`
+		_,_ = regexp.Match("foo", []byte("foobar")) // want `avoid allocations with regexp\.MatchString`
 	}
 
 	{
@@ -27,7 +27,7 @@ func main_regexp() {
 
 	{
 		
-		_,_ = Match("foo", []byte("foobar")) // want `this call can be optimized with regexp\.MatchString`
+		_,_ = Match("foo", []byte("foobar")) // want `avoid allocations with regexp\.MatchString`
 	}
 
 	{
@@ -37,7 +37,7 @@ func main_regexp() {
 
 	{
 		
-		_,_ = pkg.Match("foo", []byte("foobar")) // want `this call can be optimized with regexp\.MatchString`
+		_,_ = pkg.Match("foo", []byte("foobar")) // want `avoid allocations with regexp\.MatchString`
 	}
 
 	{
@@ -47,7 +47,7 @@ func main_regexp() {
 
 	{
 		
-		_,_ = regexp.MatchString("foo", string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with regexp\.Match`
+		_,_ = regexp.MatchString("foo", string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with regexp\.Match`
 	}
 
 	{
@@ -57,7 +57,7 @@ func main_regexp() {
 
 	{
 		
-		_,_ = MatchString("foo", string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with regexp\.Match`
+		_,_ = MatchString("foo", string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with regexp\.Match`
 	}
 
 	{
@@ -67,7 +67,7 @@ func main_regexp() {
 
 	{
 		
-		_,_ = pkg.MatchString("foo", string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with regexp\.Match`
+		_,_ = pkg.MatchString("foo", string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with regexp\.Match`
 	}
 
 	{
@@ -77,7 +77,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindAllIndex([]byte("foobar"), 1) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindAllStringIndex`
+		_ = re.FindAllIndex([]byte("foobar"), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllStringIndex`
 	}
 
 	{
@@ -87,7 +87,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindAllIndex([]byte("foobar"), 1) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindAllStringIndex`
+		_ = re.FindAllIndex([]byte("foobar"), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllStringIndex`
 	}
 
 	{
@@ -97,7 +97,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindAllIndex([]byte("foobar"), 1) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindAllStringIndex`
+		_ = re.FindAllIndex([]byte("foobar"), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllStringIndex`
 	}
 
 	{
@@ -107,7 +107,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindAllStringIndex(string([]byte{'f','o','o','b','a','r'}), 1) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindAllIndex`
+		_ = re.FindAllStringIndex(string([]byte{'f','o','o','b','a','r'}), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllIndex`
 	}
 
 	{
@@ -117,7 +117,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindAllStringIndex(string([]byte{'f','o','o','b','a','r'}), 1) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindAllIndex`
+		_ = re.FindAllStringIndex(string([]byte{'f','o','o','b','a','r'}), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllIndex`
 	}
 
 	{
@@ -127,7 +127,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindAllStringIndex(string([]byte{'f','o','o','b','a','r'}), 1) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindAllIndex`
+		_ = re.FindAllStringIndex(string([]byte{'f','o','o','b','a','r'}), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllIndex`
 	}
 
 	{
@@ -137,7 +137,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindAllStringSubmatchIndex(string([]byte{'f','o','o','b','a','r'}), 1) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindAllSubmatchIndex`
+		_ = re.FindAllStringSubmatchIndex(string([]byte{'f','o','o','b','a','r'}), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllSubmatchIndex`
 	}
 
 	{
@@ -147,7 +147,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindAllStringSubmatchIndex(string([]byte{'f','o','o','b','a','r'}), 1) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindAllSubmatchIndex`
+		_ = re.FindAllStringSubmatchIndex(string([]byte{'f','o','o','b','a','r'}), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllSubmatchIndex`
 	}
 
 	{
@@ -157,7 +157,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindAllStringSubmatchIndex(string([]byte{'f','o','o','b','a','r'}), 1) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindAllSubmatchIndex`
+		_ = re.FindAllStringSubmatchIndex(string([]byte{'f','o','o','b','a','r'}), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllSubmatchIndex`
 	}
 
 	{
@@ -167,7 +167,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindAllSubmatchIndex([]byte("foobar"), 1) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindAllStringSubmatchIndex`
+		_ = re.FindAllSubmatchIndex([]byte("foobar"), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllStringSubmatchIndex`
 	}
 
 	{
@@ -177,7 +177,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindAllSubmatchIndex([]byte("foobar"), 1) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindAllStringSubmatchIndex`
+		_ = re.FindAllSubmatchIndex([]byte("foobar"), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllStringSubmatchIndex`
 	}
 
 	{
@@ -187,7 +187,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindAllSubmatchIndex([]byte("foobar"), 1) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindAllStringSubmatchIndex`
+		_ = re.FindAllSubmatchIndex([]byte("foobar"), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllStringSubmatchIndex`
 	}
 
 	{
@@ -197,7 +197,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindIndex([]byte("foobar")) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindStringIndex`
+		_ = re.FindIndex([]byte("foobar")) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringIndex`
 	}
 
 	{
@@ -207,7 +207,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindIndex([]byte("foobar")) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindStringIndex`
+		_ = re.FindIndex([]byte("foobar")) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringIndex`
 	}
 
 	{
@@ -217,7 +217,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindIndex([]byte("foobar")) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindStringIndex`
+		_ = re.FindIndex([]byte("foobar")) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringIndex`
 	}
 
 	{
@@ -227,7 +227,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindStringIndex(string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindStringIndex`
+		_ = re.FindStringIndex(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringIndex`
 	}
 
 	{
@@ -237,7 +237,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindStringIndex(string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindStringIndex`
+		_ = re.FindStringIndex(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringIndex`
 	}
 
 	{
@@ -247,7 +247,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindStringIndex(string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindStringIndex`
+		_ = re.FindStringIndex(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringIndex`
 	}
 
 	{
@@ -257,7 +257,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindStringSubmatchIndex(string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindSubmatchIndex`
+		_ = re.FindStringSubmatchIndex(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindSubmatchIndex`
 	}
 
 	{
@@ -267,7 +267,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindStringSubmatchIndex(string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindSubmatchIndex`
+		_ = re.FindStringSubmatchIndex(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindSubmatchIndex`
 	}
 
 	{
@@ -277,7 +277,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindStringSubmatchIndex(string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindSubmatchIndex`
+		_ = re.FindStringSubmatchIndex(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindSubmatchIndex`
 	}
 
 	{
@@ -287,7 +287,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindSubmatchIndex([]byte("foobar")) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindStringSubmatchIndex`
+		_ = re.FindSubmatchIndex([]byte("foobar")) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringSubmatchIndex`
 	}
 
 	{
@@ -297,7 +297,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindSubmatchIndex([]byte("foobar")) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindStringSubmatchIndex`
+		_ = re.FindSubmatchIndex([]byte("foobar")) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringSubmatchIndex`
 	}
 
 	{
@@ -307,7 +307,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindSubmatchIndex([]byte("foobar")) // want `this call can be optimized with \(\*regexp\.Regexp\)\.FindStringSubmatchIndex`
+		_ = re.FindSubmatchIndex([]byte("foobar")) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringSubmatchIndex`
 	}
 
 	{
@@ -317,7 +317,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.Match([]byte("foobar")) // want `this call can be optimized with \(\*regexp\.Regexp\)\.MatchString`
+		_ = re.Match([]byte("foobar")) // want `avoid allocations with \(\*regexp\.Regexp\)\.MatchString`
 	}
 
 	{
@@ -327,7 +327,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.Match([]byte("foobar")) // want `this call can be optimized with \(\*regexp\.Regexp\)\.MatchString`
+		_ = re.Match([]byte("foobar")) // want `avoid allocations with \(\*regexp\.Regexp\)\.MatchString`
 	}
 
 	{
@@ -337,7 +337,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.Match([]byte("foobar")) // want `this call can be optimized with \(\*regexp\.Regexp\)\.MatchString`
+		_ = re.Match([]byte("foobar")) // want `avoid allocations with \(\*regexp\.Regexp\)\.MatchString`
 	}
 
 	{
@@ -347,7 +347,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.MatchString(string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with \(\*regexp\.Regexp\)\.Match`
+		_ = re.MatchString(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.Match`
 	}
 
 	{
@@ -357,7 +357,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.MatchString(string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with \(\*regexp\.Regexp\)\.Match`
+		_ = re.MatchString(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.Match`
 	}
 
 	{
@@ -367,7 +367,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.MatchString(string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with \(\*regexp\.Regexp\)\.Match`
+		_ = re.MatchString(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.Match`
 	}
 
 	{

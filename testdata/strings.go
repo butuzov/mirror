@@ -32,7 +32,7 @@ func main_strings() {
 
 	{
 		
-		_ = strings.Compare(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.Compare`
+		_ = strings.Compare(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.Compare`
 	}
 
 	{
@@ -52,7 +52,7 @@ func main_strings() {
 
 	{
 		
-		_ = Compare(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.Compare`
+		_ = Compare(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.Compare`
 	}
 
 	{
@@ -72,7 +72,7 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.Compare(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.Compare`
+		_ = pkg.Compare(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.Compare`
 	}
 
 	{
@@ -92,7 +92,7 @@ func main_strings() {
 
 	{
 		
-		_ = strings.Contains(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.Contains`
+		_ = strings.Contains(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.Contains`
 	}
 
 	{
@@ -112,7 +112,7 @@ func main_strings() {
 
 	{
 		
-		_ = Contains(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.Contains`
+		_ = Contains(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.Contains`
 	}
 
 	{
@@ -132,12 +132,12 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.Contains(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.Contains`
+		_ = pkg.Contains(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.Contains`
 	}
 
 	{
 		
-		_ = strings.ContainsAny(string([]byte{'f','o','o','b','a','r'}),"foobar") // want `this call can be optimized with bytes\.ContainsAny`
+		_ = strings.ContainsAny(string([]byte{'f','o','o','b','a','r'}),"foobar") // want `avoid allocations with bytes\.ContainsAny`
 	}
 
 	{
@@ -147,7 +147,7 @@ func main_strings() {
 
 	{
 		
-		_ = ContainsAny(string([]byte{'f','o','o','b','a','r'}),"foobar") // want `this call can be optimized with bytes\.ContainsAny`
+		_ = ContainsAny(string([]byte{'f','o','o','b','a','r'}),"foobar") // want `avoid allocations with bytes\.ContainsAny`
 	}
 
 	{
@@ -157,7 +157,7 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.ContainsAny(string([]byte{'f','o','o','b','a','r'}),"foobar") // want `this call can be optimized with bytes\.ContainsAny`
+		_ = pkg.ContainsAny(string([]byte{'f','o','o','b','a','r'}),"foobar") // want `avoid allocations with bytes\.ContainsAny`
 	}
 
 	{
@@ -167,7 +167,7 @@ func main_strings() {
 
 	{
 		
-		_ = strings.ContainsRune(string([]byte{'f','o','o','b','a','r'}),'ф') // want `this call can be optimized with bytes\.ContainsRune`
+		_ = strings.ContainsRune(string([]byte{'f','o','o','b','a','r'}),'ф') // want `avoid allocations with bytes\.ContainsRune`
 	}
 
 	{
@@ -177,7 +177,7 @@ func main_strings() {
 
 	{
 		
-		_ = ContainsRune(string([]byte{'f','o','o','b','a','r'}),'ф') // want `this call can be optimized with bytes\.ContainsRune`
+		_ = ContainsRune(string([]byte{'f','o','o','b','a','r'}),'ф') // want `avoid allocations with bytes\.ContainsRune`
 	}
 
 	{
@@ -187,7 +187,7 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.ContainsRune(string([]byte{'f','o','o','b','a','r'}),'ф') // want `this call can be optimized with bytes\.ContainsRune`
+		_ = pkg.ContainsRune(string([]byte{'f','o','o','b','a','r'}),'ф') // want `avoid allocations with bytes\.ContainsRune`
 	}
 
 	{
@@ -212,7 +212,7 @@ func main_strings() {
 
 	{
 		
-		_ = strings.Count(string([]byte{'f','o','o','b','a','r'}), string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.Count`
+		_ = strings.Count(string([]byte{'f','o','o','b','a','r'}), string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.Count`
 	}
 
 	{
@@ -232,7 +232,7 @@ func main_strings() {
 
 	{
 		
-		_ = Count(string([]byte{'f','o','o','b','a','r'}), string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.Count`
+		_ = Count(string([]byte{'f','o','o','b','a','r'}), string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.Count`
 	}
 
 	{
@@ -252,7 +252,7 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.Count(string([]byte{'f','o','o','b','a','r'}), string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.Count`
+		_ = pkg.Count(string([]byte{'f','o','o','b','a','r'}), string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.Count`
 	}
 
 	{
@@ -272,7 +272,7 @@ func main_strings() {
 
 	{
 		
-		_ = strings.EqualFold(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.EqualFold`
+		_ = strings.EqualFold(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.EqualFold`
 	}
 
 	{
@@ -292,7 +292,7 @@ func main_strings() {
 
 	{
 		
-		_ = EqualFold(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.EqualFold`
+		_ = EqualFold(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.EqualFold`
 	}
 
 	{
@@ -312,7 +312,7 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.EqualFold(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.EqualFold`
+		_ = pkg.EqualFold(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.EqualFold`
 	}
 
 	{
@@ -332,7 +332,7 @@ func main_strings() {
 
 	{
 		
-		_ = strings.HasPrefix(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.HasPrefix`
+		_ = strings.HasPrefix(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.HasPrefix`
 	}
 
 	{
@@ -352,7 +352,7 @@ func main_strings() {
 
 	{
 		
-		_ = HasPrefix(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.HasPrefix`
+		_ = HasPrefix(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.HasPrefix`
 	}
 
 	{
@@ -372,7 +372,7 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.HasPrefix(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.HasPrefix`
+		_ = pkg.HasPrefix(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.HasPrefix`
 	}
 
 	{
@@ -392,7 +392,7 @@ func main_strings() {
 
 	{
 		
-		_ = strings.HasSuffix(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.HasSuffix`
+		_ = strings.HasSuffix(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.HasSuffix`
 	}
 
 	{
@@ -412,7 +412,7 @@ func main_strings() {
 
 	{
 		
-		_ = HasSuffix(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.HasSuffix`
+		_ = HasSuffix(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.HasSuffix`
 	}
 
 	{
@@ -432,7 +432,7 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.HasSuffix(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.HasSuffix`
+		_ = pkg.HasSuffix(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.HasSuffix`
 	}
 
 	{
@@ -452,7 +452,7 @@ func main_strings() {
 
 	{
 		
-		_ = strings.Index(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.Index`
+		_ = strings.Index(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.Index`
 	}
 
 	{
@@ -472,7 +472,7 @@ func main_strings() {
 
 	{
 		
-		_ = Index(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.Index`
+		_ = Index(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.Index`
 	}
 
 	{
@@ -492,12 +492,12 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.Index(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.Index`
+		_ = pkg.Index(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.Index`
 	}
 
 	{
 		
-		_ = strings.IndexAny(string([]byte{'f','o','o','b','a','r'}), "f") // want `this call can be optimized with bytes\.IndexAny`
+		_ = strings.IndexAny(string([]byte{'f','o','o','b','a','r'}), "f") // want `avoid allocations with bytes\.IndexAny`
 	}
 
 	{
@@ -507,7 +507,7 @@ func main_strings() {
 
 	{
 		
-		_ = IndexAny(string([]byte{'f','o','o','b','a','r'}), "f") // want `this call can be optimized with bytes\.IndexAny`
+		_ = IndexAny(string([]byte{'f','o','o','b','a','r'}), "f") // want `avoid allocations with bytes\.IndexAny`
 	}
 
 	{
@@ -517,7 +517,7 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.IndexAny(string([]byte{'f','o','o','b','a','r'}), "f") // want `this call can be optimized with bytes\.IndexAny`
+		_ = pkg.IndexAny(string([]byte{'f','o','o','b','a','r'}), "f") // want `avoid allocations with bytes\.IndexAny`
 	}
 
 	{
@@ -527,7 +527,7 @@ func main_strings() {
 
 	{
 		
-		_ = strings.IndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `this call can be optimized with bytes\.IndexByte`
+		_ = strings.IndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `avoid allocations with bytes\.IndexByte`
 	}
 
 	{
@@ -537,7 +537,7 @@ func main_strings() {
 
 	{
 		
-		_ = IndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `this call can be optimized with bytes\.IndexByte`
+		_ = IndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `avoid allocations with bytes\.IndexByte`
 	}
 
 	{
@@ -547,7 +547,7 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.IndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `this call can be optimized with bytes\.IndexByte`
+		_ = pkg.IndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `avoid allocations with bytes\.IndexByte`
 	}
 
 	{
@@ -557,7 +557,7 @@ func main_strings() {
 
 	{
 		
-		_ = strings.IndexFunc(string([]byte{'f','o','o','b','a','r'}),func(r rune) bool { return true }) // want `this call can be optimized with bytes\.IndexFunc`
+		_ = strings.IndexFunc(string([]byte{'f','o','o','b','a','r'}),func(r rune) bool { return true }) // want `avoid allocations with bytes\.IndexFunc`
 	}
 
 	{
@@ -567,7 +567,7 @@ func main_strings() {
 
 	{
 		
-		_ = IndexFunc(string([]byte{'f','o','o','b','a','r'}),func(r rune) bool { return true }) // want `this call can be optimized with bytes\.IndexFunc`
+		_ = IndexFunc(string([]byte{'f','o','o','b','a','r'}),func(r rune) bool { return true }) // want `avoid allocations with bytes\.IndexFunc`
 	}
 
 	{
@@ -577,7 +577,7 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.IndexFunc(string([]byte{'f','o','o','b','a','r'}),func(r rune) bool { return true }) // want `this call can be optimized with bytes\.IndexFunc`
+		_ = pkg.IndexFunc(string([]byte{'f','o','o','b','a','r'}),func(r rune) bool { return true }) // want `avoid allocations with bytes\.IndexFunc`
 	}
 
 	{
@@ -587,7 +587,7 @@ func main_strings() {
 
 	{
 		
-		_ = strings.IndexRune(string([]byte{'f','o','o','b','a','r'}), rune('ф')) // want `this call can be optimized with bytes\.IndexRune`
+		_ = strings.IndexRune(string([]byte{'f','o','o','b','a','r'}), rune('ф')) // want `avoid allocations with bytes\.IndexRune`
 	}
 
 	{
@@ -597,7 +597,7 @@ func main_strings() {
 
 	{
 		
-		_ = IndexRune(string([]byte{'f','o','o','b','a','r'}), rune('ф')) // want `this call can be optimized with bytes\.IndexRune`
+		_ = IndexRune(string([]byte{'f','o','o','b','a','r'}), rune('ф')) // want `avoid allocations with bytes\.IndexRune`
 	}
 
 	{
@@ -607,7 +607,7 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.IndexRune(string([]byte{'f','o','o','b','a','r'}), rune('ф')) // want `this call can be optimized with bytes\.IndexRune`
+		_ = pkg.IndexRune(string([]byte{'f','o','o','b','a','r'}), rune('ф')) // want `avoid allocations with bytes\.IndexRune`
 	}
 
 	{
@@ -632,7 +632,7 @@ func main_strings() {
 
 	{
 		
-		_ = strings.LastIndex(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.LastIndex`
+		_ = strings.LastIndex(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.LastIndex`
 	}
 
 	{
@@ -652,7 +652,7 @@ func main_strings() {
 
 	{
 		
-		_ = LastIndex(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.LastIndex`
+		_ = LastIndex(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.LastIndex`
 	}
 
 	{
@@ -672,12 +672,12 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.LastIndex(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with bytes\.LastIndex`
+		_ = pkg.LastIndex(string([]byte{'f','o','o','b','a','r'}),string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.LastIndex`
 	}
 
 	{
 		
-		_ = strings.LastIndexAny(string([]byte{'f','o','o','b','a','r'}),"f") // want `this call can be optimized with bytes\.LastIndexAny`
+		_ = strings.LastIndexAny(string([]byte{'f','o','o','b','a','r'}),"f") // want `avoid allocations with bytes\.LastIndexAny`
 	}
 
 	{
@@ -687,7 +687,7 @@ func main_strings() {
 
 	{
 		
-		_ = LastIndexAny(string([]byte{'f','o','o','b','a','r'}),"f") // want `this call can be optimized with bytes\.LastIndexAny`
+		_ = LastIndexAny(string([]byte{'f','o','o','b','a','r'}),"f") // want `avoid allocations with bytes\.LastIndexAny`
 	}
 
 	{
@@ -697,7 +697,7 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.LastIndexAny(string([]byte{'f','o','o','b','a','r'}),"f") // want `this call can be optimized with bytes\.LastIndexAny`
+		_ = pkg.LastIndexAny(string([]byte{'f','o','o','b','a','r'}),"f") // want `avoid allocations with bytes\.LastIndexAny`
 	}
 
 	{
@@ -707,7 +707,7 @@ func main_strings() {
 
 	{
 		
-		_ = strings.LastIndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `this call can be optimized with bytes\.LastIndexByte`
+		_ = strings.LastIndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `avoid allocations with bytes\.LastIndexByte`
 	}
 
 	{
@@ -717,7 +717,7 @@ func main_strings() {
 
 	{
 		
-		_ = LastIndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `this call can be optimized with bytes\.LastIndexByte`
+		_ = LastIndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `avoid allocations with bytes\.LastIndexByte`
 	}
 
 	{
@@ -727,7 +727,7 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.LastIndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `this call can be optimized with bytes\.LastIndexByte`
+		_ = pkg.LastIndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `avoid allocations with bytes\.LastIndexByte`
 	}
 
 	{
@@ -737,7 +737,7 @@ func main_strings() {
 
 	{
 		
-		_ = strings.LastIndexFunc(string([]byte{'f','o','o','b','a','r'}), func(r rune) bool { return true }) // want `this call can be optimized with bytes\.LastIndexAny`
+		_ = strings.LastIndexFunc(string([]byte{'f','o','o','b','a','r'}), func(r rune) bool { return true }) // want `avoid allocations with bytes\.LastIndexAny`
 	}
 
 	{
@@ -747,7 +747,7 @@ func main_strings() {
 
 	{
 		
-		_ = LastIndexFunc(string([]byte{'f','o','o','b','a','r'}), func(r rune) bool { return true }) // want `this call can be optimized with bytes\.LastIndexAny`
+		_ = LastIndexFunc(string([]byte{'f','o','o','b','a','r'}), func(r rune) bool { return true }) // want `avoid allocations with bytes\.LastIndexAny`
 	}
 
 	{
@@ -757,7 +757,7 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.LastIndexFunc(string([]byte{'f','o','o','b','a','r'}), func(r rune) bool { return true }) // want `this call can be optimized with bytes\.LastIndexAny`
+		_ = pkg.LastIndexFunc(string([]byte{'f','o','o','b','a','r'}), func(r rune) bool { return true }) // want `avoid allocations with bytes\.LastIndexAny`
 	}
 
 	{
@@ -767,7 +767,7 @@ func main_strings() {
 
 	{
 		builder := strings.Builder{}
-		_,_ = builder.Write([]byte("foobar")) // want `this call can be optimized with WriteString method`
+		_,_ = builder.Write([]byte("foobar")) // want `avoid allocations with \(\*strings\.Builder\)\.WriteString`
 	}
 
 	{
@@ -777,7 +777,7 @@ func main_strings() {
 
 	{
 		builder := strings.Builder{}
-		_,_ = builder.Write([]byte("foobar")) // want `this call can be optimized with WriteString method`
+		_,_ = builder.Write([]byte("foobar")) // want `avoid allocations with \(\*strings\.Builder\)\.WriteString`
 	}
 
 	{
@@ -787,7 +787,7 @@ func main_strings() {
 
 	{
 		builder := strings.Builder{}
-		_,_ = builder.Write([]byte("foobar")) // want `this call can be optimized with WriteString method`
+		_,_ = builder.Write([]byte("foobar")) // want `avoid allocations with \(\*strings\.Builder\)\.WriteString`
 	}
 
 	{
@@ -797,7 +797,7 @@ func main_strings() {
 
 	{
 		builder := strings.Builder{}
-		_,_ = builder.WriteString(string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with Write method`
+		_,_ = builder.WriteString(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*strings\.Builder\)\.Write`
 	}
 
 	{
@@ -807,7 +807,7 @@ func main_strings() {
 
 	{
 		builder := strings.Builder{}
-		_,_ = builder.WriteString(string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with Write method`
+		_,_ = builder.WriteString(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*strings\.Builder\)\.Write`
 	}
 
 	{
@@ -817,7 +817,7 @@ func main_strings() {
 
 	{
 		builder := strings.Builder{}
-		_,_ = builder.WriteString(string([]byte{'f','o','o','b','a','r'})) // want `this call can be optimized with Write method`
+		_,_ = builder.WriteString(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*strings\.Builder\)\.Write`
 	}
 
 	{
