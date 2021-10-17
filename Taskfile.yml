@@ -11,6 +11,7 @@ tasks:
     - ls -lah bin/
     - make tests
     - make lints
+
   testcase: go test -v -failfast -count=1 -run "TestAll/{{ .Case }}" ./...
 
   regen:
@@ -42,7 +43,7 @@ tasks:
     - echo "done"
 
   install: make install
-  build`: make build
+  build: make build
 
   tests:
     cmds:

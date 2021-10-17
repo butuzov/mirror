@@ -8,6 +8,7 @@ import (
 	"go/types"
 	"os"
 
+	"github.com/butuzov/mirror/internal/imports"
 	"github.com/davecgh/go-spew/spew"
 	"golang.org/x/tools/go/analysis"
 )
@@ -20,7 +21,7 @@ type Checker struct {
 
 	debug   func(ast.Expr)
 	types   map[ast.Expr]types.TypeAndValue
-	imports map[string][]string
+	imports []imports.KV
 	// temporary fields, assigned to checker just before check.
 	tFset *token.FileSet
 	tPass *analysis.Pass
@@ -72,7 +73,7 @@ func (rc *Checker) WithTypes(typesInfo map[ast.Expr]types.TypeAndValue) *Checker
 	return rc
 }
 
-func (rc *Checker) WithImports(imports map[string][]string) *Checker {
+func (rc *Checker) WithImports(imports []imports.KV) *Checker {
 	rc.imports = imports
 	return rc
 }
@@ -195,27 +196,23 @@ func (c *Checker) handleDiagnostic(d *Violation, ce *ast.CallExpr) (m map[int]as
 	return m, len(m) == len(d.Args)
 }
 
-// will check if imports has
+// hasImport will check if imports we we have imported pkg as alias?
 func (c *Checker) hasImport(pkg, alias string) (res bool) {
-	if c.imports == nil {
+	if len(c.imports) == 0 {
 		return false
 	}
 
-	_, ok := c.imports[pkg]
-	if !ok {
-		return false
-	}
-
-	for _, as := range c.imports[pkg] {
-		if as == alias {
+	for i := range c.imports {
+		if c.imports[i].Val == alias && c.imports[i].Key == pkg {
 			return true
 		}
 	}
+
 	return false
 }
 
 const (
-	// --- string constants for string compare
+	// --- string constants for string compare.
 	nameStr  = "string"
 	nameByte = "byte"
 )
