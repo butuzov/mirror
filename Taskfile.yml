@@ -34,11 +34,11 @@ tasks:
     - cmd: clear
     - cmd: date
     - task: build
+    - cmd: go run ../cmd/mirror --with-tests --with-debug ./...
+      ignore_error: true
     - task: lints
       ignore_error: true
     - task: tests
-      ignore_error: true
-    - cmd: go run ../cmd/mirror --with-tests --with-debug ./...
       ignore_error: true
     - echo "done"
 

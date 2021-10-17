@@ -10,6 +10,3 @@ func TestAll(t *testing.T) {
 	analysistest.Run(t, analysistest.TestData(), NewAnalyzer())
 }
 
-func TestDebug(t *testing.T) {
-	analysistest.RunWithSuggestedFixes(t, analysistest.TestData(), NewAnalyzer())
-}
