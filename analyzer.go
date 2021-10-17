@@ -5,8 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"go/ast"
+	"go/printer"
 	"go/token"
 	"go/types"
+	"os"
 	"sort"
 	"strings"
 
@@ -236,7 +238,7 @@ func (s suggest) Bytes() []byte {
 		panic("what is that? not implemented")
 	}
 
-	fmt.Fprint(&suggest, "(")
+	suggest.WriteByte('(')
 
 	// arguments.
 	var args []string
@@ -248,8 +250,8 @@ func (s suggest) Bytes() []byte {
 		args = append(args, types.ExprString(v))
 	}
 
-	fmt.Fprint(&suggest, strings.Join(args, ", "))
-	fmt.Fprint(&suggest, ")")
+	suggest.WriteString(strings.Join(args, ", "))
+	suggest.WriteByte(')')
 
 	return suggest.Bytes()
 }
@@ -258,9 +260,9 @@ func (s suggest) Bytes() []byte {
 //
 //                             | bytes | strings | str | .
 //                             ----------------------------
-//                       bytes |   x   |    x    |     |
-//  current package      b     |   x   |    x    |     |
-//                       .     |   x   |    x    |     |
+//                       bytes |   x   |    x    |  x  | x
+//  current package      b     |   x   |    x    |  x  | x
+//                       .     |   x   |    x    |  x  | x
 //
 func (s suggest) importsReplacementLookup(pkgCur, pkgNew string) string {
 	// It's same package (with no alias import).
@@ -268,7 +270,8 @@ func (s suggest) importsReplacementLookup(pkgCur, pkgNew string) string {
 		return pkgCur
 	}
 
-	// Searching for real name of dot imported, aliased or regularly imported package.
+	// Searching for real name of dot imported, aliased or regularly
+	// imported package.
 	var pkgCurName string
 	for i := range s.imports {
 		if s.imports[i].Val == pkgCur {
@@ -290,4 +293,39 @@ func (s suggest) importsReplacementLookup(pkgCur, pkgNew string) string {
 	}
 
 	return pkgNew
+}
+
+// --- debug -------------------------------------------------------------------
+
+func debug(f *token.FileSet, t map[ast.Expr]types.TypeAndValue) func(ast.Expr) {
+	return func(node ast.Expr) {
+		tv := t[node]
+		Errorf("how to work with %T of type %#v ?\n", node, tv)
+
+		fmt.Print("affected line> ")
+		printer.Fprint(os.Stdout, f, node)
+		fmt.Println()
+		fmt.Println(strings.Repeat("^", 80))
+	}
+}
+
+func debugNoOp(_ ast.Expr) {}
+
+// Errorf is function that reports error
+const (
+	prefixErr  = "\033[91m [ERR] \033[0m"
+	prefixWarn = "\033[93m [ERR] \033[0m"
+	prefixInfo = "\033[94m [ERR] \033[0m"
+)
+
+func Errorf(format string, args ...interface{}) {
+	fmt.Printf(prefixErr+format, args...)
+}
+
+func Warnf(format string, args ...interface{}) {
+	fmt.Printf(prefixWarn+format, args...)
+}
+
+func Infof(format string, args ...interface{}) {
+	fmt.Printf(prefixInfo+format, args...)
 }
