@@ -11,6 +11,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/butuzov/mirror/internal/checker"
 	"github.com/butuzov/mirror/internal/imports"
@@ -24,6 +25,8 @@ import (
 type analyzer struct {
 	imports  map[string][]imports.KV // Alias & name of imports sorted per file
 	checkers []*checker.Checker      // Available checkers.
+
+	lock sync.Mutex
 }
 
 func NewAnalyzer() *analysis.Analyzer {
@@ -123,6 +126,9 @@ func isTest(fileName string) bool {
 }
 
 func (a *analyzer) loadImports(fs *token.FileSet, ins *inspector.Inspector) {
+	a.lock.Lock()
+	defer a.lock.Unlock()
+
 	ins.Preorder([]ast.Node{(*ast.ImportSpec)(nil)}, func(node ast.Node) {
 		is, _ := node.(*ast.ImportSpec)
 
@@ -156,6 +162,9 @@ func (a *analyzer) loadImports(fs *token.FileSet, ins *inspector.Inspector) {
 
 // localImports (it relation to token.Pos) found in fileset
 func (a *analyzer) locaImports(p token.Pos, fs *token.FileSet) []imports.KV {
+	a.lock.Lock()
+	defer a.lock.Unlock()
+
 	fileName := fs.Position(p).Filename
 	if v, ok := a.imports[fileName]; ok {
 		return v

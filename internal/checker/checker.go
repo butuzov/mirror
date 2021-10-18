@@ -202,8 +202,8 @@ func (c *Checker) hasImport(pkg, alias string) (res bool) {
 		return false
 	}
 
-	for i := range c.imports {
-		if c.imports[i].Val == alias && c.imports[i].Key == pkg {
+	for _, v := range c.imports {
+		if v.Val == alias && v.Key == pkg {
 			return true
 		}
 	}
