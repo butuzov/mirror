@@ -2,4 +2,4 @@
 coverage.cov
 bin/*
 dist/*
-
+tmp/*

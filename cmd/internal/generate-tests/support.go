@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/butuzov/mirror/internal/rules"
+	"github.com/butuzov/mirror/internal/checker"
 )
 
 type TestCase struct {
@@ -76,7 +76,7 @@ func PkgImports(pkg string) []string {
 func QuoteRegexp(s string) string {
 	var str strings.Builder
 	for i := range s {
-		if strings.ContainsAny(string(s[i]), "().*\\") {
+		if bytes.ContainsAny([]byte{s[i]}, "().*\\") {
 			str.WriteByte('\\')
 		}
 		str.WriteByte(s[i])
@@ -135,7 +135,7 @@ func makeFuncInline(pattern string, replaces []string) string {
 	return pattern
 }
 
-func generateTests(pkgName string, list map[string]rules.Diagnostic) []string {
+func generateTests(pkgName string, list map[string]checker.Violation) []string {
 	var tests []string
 
 	// order of the functions
@@ -148,8 +148,8 @@ func generateTests(pkgName string, list map[string]rules.Diagnostic) []string {
 	// tests variance
 	for _, key := range keys {
 		test := list[key]
-		// stop condition with log error
-		if test.GenPattern == "" {
+
+		if test.Generate == nil || test.Generate.Pattern == "" {
 			log.Printf("required fields not supported: %#v\n", test)
 			continue
 		}
@@ -164,32 +164,18 @@ func generateTests(pkgName string, list map[string]rules.Diagnostic) []string {
 
 				var b1 bytes.Buffer
 
-				// simple test with input variables
-				// DONE(butuzov): extenal variables
-				// templates.ExecuteTemplate(&b1, "case.tmpl", TestCase{
-				// 	Arguments: variate(variance, test.GenString),
-				// 	Returns:   GenReturnelements(test.GenReturns),
-				// 	Package:   pkg,
-				// 	Func:      makeFunc(test.GenPattern, variate(variance, test.GenString)),
-				// 	Want:      wantStr,
-				// })
-				// tests = append(tests, b1.String())
-
-				// TODO(butuzov)  random variables
-				// TODO(butuzov): inline variables
 				{
-
 					pkgInTest := pkg
-					if test.GenCondition != "" {
-						pkgInTest = strings.Trim(strings.Split(test.GenCondition, ":=")[0], " ")
+					if test.Generate.PreCondition != "" {
+						pkgInTest = strings.Trim(strings.Split(test.Generate.PreCondition, ":=")[0], " ")
 					}
 
 					templates.ExecuteTemplate(&b1, "case.tmpl", TestCase{
 						Arguments: []string{},
-						Returns:   GenReturnelements(test.GenReturns),
+						Returns:   GenReturnelements(test.Generate.Returns),
 						Package:   pkgInTest,
-						PreCond:   test.GenCondition,
-						Func:      makeFuncInline(test.GenPattern, variate(variance, test.TargetStrings)),
+						PreCond:   test.Generate.PreCondition,
+						Func:      makeFuncInline(test.Generate.Pattern, variate(variance, test.StringTargeted)),
 						Want:      wantStr,
 					})
 					tests = append(tests, b1.String())

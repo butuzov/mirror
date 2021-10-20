@@ -60,7 +60,7 @@ func testdataExistenceCheck(path string) bool {
 	return true
 }
 
-func GenerateTestFile(file string, Package string, Struct string, Tests []string) error {
+func GenerateTestFile(file string, pkgName string, structName string, Tests []string) error {
 	f, err := os.Create(file)
 	if err != nil {
 		return err
@@ -75,8 +75,8 @@ func GenerateTestFile(file string, Package string, Struct string, Tests []string
 		Struct  string
 		Tests   string
 	}{
-		Package,
-		Struct,
+		pkgName,
+		structName,
 		strings.Join(Tests, "\n"),
 	})
 }

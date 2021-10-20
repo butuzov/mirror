@@ -1,79 +1,283 @@
 package rules
 
-import (
-	"go/ast"
-	"go/types"
+import "github.com/butuzov/mirror/internal/checker"
 
-	"github.com/butuzov/mirror/internal/data"
-	"golang.org/x/tools/go/analysis"
+func NewStringsChecker() *checker.Checker {
+	return checker.New("strings").
+		WithFunctions(StringFunctions).
+		WithStructMethods("strings.Builder", StringsBuilderMethods)
+}
+
+var (
+	StringFunctions = map[string]checker.Violation{
+		"Compare": {
+			Type:           checker.Function,
+			Message:        "avoid allocations with bytes.Compare",
+			Args:           []int{0, 1},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Package:  `bytes`,
+				Function: `Compare`,
+			},
+			Generate: &checker.Generate{
+				Pattern: `Compare($0,$1)`,
+				Returns: 1,
+			},
+		},
+		"Contains": {
+			Type:           checker.Function,
+			Message:        "avoid allocations with bytes.Contains",
+			Args:           []int{0, 1},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Package:  `bytes`,
+				Function: `Contains`,
+			},
+			Generate: &checker.Generate{
+				Pattern: `Contains($0,$1)`,
+				Returns: 1,
+			},
+		},
+		"ContainsAny": {
+			Type:           checker.Function,
+			Message:        "avoid allocations with bytes.ContainsAny",
+			Args:           []int{0},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Package:  `bytes`,
+				Function: `ContainsAny`,
+			},
+			Generate: &checker.Generate{
+				Pattern: `ContainsAny($0,"foobar")`,
+				Returns: 1,
+			},
+		},
+		"ContainsRune": {
+			Type:           checker.Function,
+			Message:        "avoid allocations with bytes.ContainsRune",
+			Args:           []int{0},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Package:  `bytes`,
+				Function: `ContainsRune`,
+			},
+			Generate: &checker.Generate{
+				Pattern: `ContainsRune($0,'ф')`,
+				Returns: 1,
+			},
+		},
+		"Count": {
+			Type:           checker.Function,
+			Message:        "avoid allocations with bytes.Count",
+			Args:           []int{0, 1},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Package:  `bytes`,
+				Function: `Count`,
+			},
+			Generate: &checker.Generate{
+				Pattern: `Count($0, $1)`,
+				Returns: 1,
+			},
+		},
+		"EqualFold": {
+			Type:           checker.Function,
+			Message:        "avoid allocations with bytes.EqualFold",
+			Args:           []int{0, 1},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Package:  `bytes`,
+				Function: `EqualFold`,
+			},
+			Generate: &checker.Generate{
+				Pattern: `EqualFold($0,$1)`,
+				Returns: 1,
+			},
+		},
+		"HasPrefix": {
+			Type:           checker.Function,
+			Message:        "avoid allocations with bytes.HasPrefix",
+			Args:           []int{0, 1},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Package:  `bytes`,
+				Function: `HasPrefix`,
+			},
+			Generate: &checker.Generate{
+				Pattern: `HasPrefix($0,$1)`,
+				Returns: 1,
+			},
+		},
+		"HasSuffix": {
+			Type:           checker.Function,
+			Message:        "avoid allocations with bytes.HasSuffix",
+			Args:           []int{0, 1},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Package:  `bytes`,
+				Function: `HasSuffix`,
+			},
+			Generate: &checker.Generate{
+				Pattern: `HasSuffix($0,$1)`,
+				Returns: 1,
+			},
+		},
+		"Index": {
+			Type:           checker.Function,
+			Message:        "avoid allocations with bytes.Index",
+			Args:           []int{0, 1},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Package:  `bytes`,
+				Function: `Index`,
+			},
+			Generate: &checker.Generate{
+				Pattern: `Index($0,$1)`,
+				Returns: 1,
+			},
+		},
+		"IndexAny": {
+			Type:           checker.Function,
+			Message:        "avoid allocations with bytes.IndexAny",
+			Args:           []int{0},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Package:  `bytes`,
+				Function: `IndexAny`,
+			},
+			Generate: &checker.Generate{
+				Pattern: `IndexAny($0, "f")`,
+				Returns: 1,
+			},
+		},
+		"IndexByte": {
+			Type:           checker.Function,
+			Message:        "avoid allocations with bytes.IndexByte",
+			Args:           []int{0},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Package:  `bytes`,
+				Function: `IndexByte`,
+			},
+			Generate: &checker.Generate{
+				Pattern: `IndexByte($0, byte('f'))`,
+				Returns: 1,
+			},
+		},
+		"IndexFunc": {
+			Type:           checker.Function,
+			Message:        "avoid allocations with bytes.IndexFunc",
+			Args:           []int{0},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Package:  `bytes`,
+				Function: `IndexFunc`,
+			},
+			Generate: &checker.Generate{
+				Pattern: `IndexFunc($0,func(r rune) bool { return true })`,
+				Returns: 1,
+			},
+		},
+		"IndexRune": {
+			Type:           checker.Function,
+			Message:        "avoid allocations with bytes.IndexRune",
+			Args:           []int{0},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Package:  `bytes`,
+				Function: `IndexRune`,
+			},
+			Generate: &checker.Generate{
+				Pattern: `IndexRune($0, rune('ф'))`,
+				Returns: 1,
+			},
+		},
+		"LastIndex": {
+			Type:           checker.Function,
+			Message:        "avoid allocations with bytes.LastIndex",
+			Args:           []int{0, 1},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Package:  `bytes`,
+				Function: `LastIndex`,
+			},
+			Generate: &checker.Generate{
+				Pattern: `LastIndex($0,$1)`,
+				Returns: 1,
+			},
+		},
+		"LastIndexAny": {
+			Type:           checker.Function,
+			Message:        "avoid allocations with bytes.LastIndexAny",
+			Args:           []int{0},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Package:  `bytes`,
+				Function: `LastIndexAny`,
+			},
+			Generate: &checker.Generate{
+				Pattern: `LastIndexAny($0,"f")`,
+				Returns: 1,
+			},
+		},
+		"LastIndexByte": {
+			Type:           checker.Function,
+			Message:        "avoid allocations with bytes.LastIndexByte",
+			Args:           []int{0},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Package:  `bytes`,
+				Function: `LastIndexByte`,
+			},
+			Generate: &checker.Generate{
+				Pattern: `LastIndexByte($0, byte('f'))`,
+				Returns: 1,
+			},
+		},
+		"LastIndexFunc": {
+			Type:           checker.Function,
+			Message:        "avoid allocations with bytes.LastIndexAny",
+			Args:           []int{0},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Package:  `bytes`,
+				Function: `LastIndexAny`,
+			},
+			Generate: &checker.Generate{
+				Pattern: `LastIndexFunc($0, func(r rune) bool { return true })`,
+				Returns: 1,
+			},
+		},
+	}
+
+	StringsBuilderMethods = map[string]checker.Violation{
+		"Write": {
+			Type:           checker.Method,
+			Message:        "avoid allocations with (*strings.Builder).WriteString",
+			Args:           []int{0},
+			StringTargeted: false,
+			Alternative: checker.Alternative{
+				Method: `WriteString`,
+			},
+			Generate: &checker.Generate{
+				PreCondition: `builder := strings.Builder{}`,
+				Pattern:      `Write($0)`,
+				Returns:      2,
+			},
+		},
+		"WriteString": {
+			Type:           checker.Method,
+			Message:        "avoid allocations with (*strings.Builder).Write",
+			Args:           []int{0},
+			StringTargeted: true,
+			Alternative: checker.Alternative{
+				Method: `Write`,
+			},
+			Generate: &checker.Generate{
+				PreCondition: `builder := strings.Builder{}`,
+				Pattern:      `WriteString($0)`,
+				Returns:      2,
+			},
+		},
+	}
 )
-
-// todo(butuzov): detection of something that string(regexp)
-
-type StringsCheckers struct{}
-
-func (re *StringsCheckers) Check(ce *ast.CallExpr, ld *data.Data) []analysis.Diagnostic {
-	switch v := ce.Fun.(type) {
-	case *ast.SelectorExpr:
-
-		// selector expression can be matched to package functions (regexp.Match) &
-		// also tot he receiver methods, so first we need to know which of this
-		// two cases we looking for.
-		x, ok := v.X.(*ast.Ident)
-		if !ok {
-			return nil
-		}
-
-		// function (v.Sel.Name) Match(String)? on imported package `regexp` (x.Name)
-		if d, ok := StringFunctions[v.Sel.Name]; ok && ld.HasImport(`strings`, x.Name) {
-			// proceed with check
-			if res := check(d.Args, ce.Args, d.TargetStrings); len(res) != len(d.Args) {
-				return nil
-			}
-
-			// TODO: SuggestedFixes
-			// 1) add or remove string
-			// 2) remove parameter wrapping
-			return []analysis.Diagnostic{{Pos: ce.Pos(), Message: d.Message}}
-
-		}
-
-		// method of the regexp.Regexp
-		if d, ok := StringsBuilderMethods[v.Sel.Name]; ok && isStringsBuilderType(ld.Types[v.X]) {
-			// proceed with check
-			if res := check(d.Args, ce.Args, d.TargetStrings); len(res) != len(d.Args) {
-				return nil
-			}
-
-			// TODO: SuggestedFixes
-			// 1) add or remove string
-			// 2) remove parameter wrapping
-			return []analysis.Diagnostic{{Pos: ce.Pos(), Message: d.Message}}
-		}
-
-	case *ast.Ident:
-		// function (v.Sel.Name) Match(String)? on dot imported package `regexp`
-		if d, ok := StringFunctions[v.Name]; ok && ld.HasImport(`strings`, `.`) {
-			// proceed with check
-			if res := check(d.Args, ce.Args, d.TargetStrings); len(res) != len(d.Args) {
-				return nil
-			}
-
-			// TODO: SuggestedFixes
-			// 1) add or remove string
-			// 2) remove parameter wrapping
-			return []analysis.Diagnostic{{Pos: ce.Pos(), Message: d.Message}}
-		}
-	}
-
-	return nil
-}
-
-func isStringsBuilderType(tv types.TypeAndValue) bool {
-	if !tv.IsValue() {
-		return false
-	}
-	s := tv.Type.String()
-
-	return s == "*strings.Builder" || s == "strings.Builder"
-}

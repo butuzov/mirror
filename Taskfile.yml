@@ -11,4 +11,46 @@ tasks:
     - ls -lah bin/
     - make tests
     - make lints
+
   testcase: go test -v -failfast -count=1 -run "TestAll/{{ .Case }}" ./...
+
+  regen:
+    sources:
+    - ./cmd/internal/generate-tests/*.go
+    - ./internal/rules/*.go
+    - ./cmd/internal/generate-tests/tempaltes/*.tmpl
+    method: timestamp
+    cmds:
+    - go build -o bin/genrate-tests ./cmd/internal/generate-tests/
+    - ./bin/genrate-tests ./testdata
+    - make tests
+
+  tdd:
+    dir: ./testdata
+    sources:
+    - ./**/*.go
+    method: timestamp
+    cmds:
+    - cmd: clear
+    - cmd: date
+    - task: build
+    - cmd: go run ../cmd/mirror --with-tests --with-debug ./...
+      ignore_error: true
+    - task: lints
+      ignore_error: true
+    - task: tests
+      ignore_error: true
+    - echo "done"
+
+  install: make install
+  build: make build
+
+  tests:
+    cmds:
+    - cmd: make tests
+      ignore_error: true
+
+  lints:
+    cmds:
+    - cmd: make lints
+      ignore_error: true
