@@ -1,11 +1,13 @@
-package rules
+package mirror
 
 import "github.com/butuzov/mirror/internal/checker"
 
-func NewStringsChecker() *checker.Checker {
-	return checker.New("strings").
-		WithFunctions(StringFunctions).
-		WithStructMethods("strings.Builder", StringsBuilderMethods)
+func newStringsChecker() *checker.Checker {
+	c := checker.New("strings")
+	c.Functions = StringFunctions
+	c.Methods["strings.Builder"] = StringsBuilderMethods
+
+	return c
 }
 
 var (

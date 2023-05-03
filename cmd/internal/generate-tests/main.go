@@ -9,7 +9,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/butuzov/mirror/internal/rules"
+	"github.com/butuzov/mirror"
 )
 
 //go:embed templates
@@ -27,8 +27,8 @@ func main() {
 	{ // regexp
 
 		tests := []string{}
-		tests = append(tests, generateTests("regexp", rules.RegexpFunctions)...)
-		tests = append(tests, generateTests("regexp", rules.RegexpRegexpMethods)...)
+		tests = append(tests, generateTests("regexp", mirror.RegexpFunctions)...)
+		tests = append(tests, generateTests("regexp", mirror.RegexpRegexpMethods)...)
 
 		GenerateTestFile(filepath.Join(testdata, "regexp.go"), "regexp", "Regexp", tests)
 	}
@@ -36,8 +36,8 @@ func main() {
 	{ // strings
 
 		tests := []string{}
-		tests = append(tests, generateTests("strings", rules.StringFunctions)...)
-		tests = append(tests, generateTests("strings", rules.StringsBuilderMethods)...)
+		tests = append(tests, generateTests("strings", mirror.StringFunctions)...)
+		tests = append(tests, generateTests("strings", mirror.StringsBuilderMethods)...)
 
 		GenerateTestFile(filepath.Join(testdata, "strings.go"), "strings", "Builder", tests)
 	}
@@ -45,8 +45,8 @@ func main() {
 	{ // bytes
 
 		tests := []string{}
-		tests = append(tests, generateTests("bytes", rules.BytesFunctions)...)
-		tests = append(tests, generateTests("bytes", rules.BytesBufferMethods)...)
+		tests = append(tests, generateTests("bytes", mirror.BytesFunctions)...)
+		tests = append(tests, generateTests("bytes", mirror.BytesBufferMethods)...)
 
 		GenerateTestFile(filepath.Join(testdata, "bytes.go"), "bytes", "Buffer", tests)
 	}

@@ -1,11 +1,13 @@
-package rules
+package mirror
 
 import "github.com/butuzov/mirror/internal/checker"
 
-func NewBytesChecker() *checker.Checker {
-	return checker.New("bytes").
-		WithFunctions(BytesFunctions).
-		WithStructMethods("bytes.Buffer", BytesBufferMethods)
+func newBytesChecker() *checker.Checker {
+	c := checker.New("bytes")
+	c.Functions = BytesFunctions
+	c.Methods["bytes.Buffer"] = BytesBufferMethods
+
+	return c
 }
 
 var (

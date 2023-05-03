@@ -2,10 +2,19 @@ package main
 
 import (
 	"bytes"
+	"fmt"
+	"os"
 	"strings"
 )
 
 const s3 string = "a"
+
+// strins are ot string
+func v(n int) (err error) {
+	n += 1
+	_, err = fmt.Fprintf(os.Stdout, "sss: %d", n)
+	return err
+}
 
 func m() {
 	golden := "foobar"

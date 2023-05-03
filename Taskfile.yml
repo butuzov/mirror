@@ -4,13 +4,13 @@ tasks:
   default:
     sources:
     - "./**/*.go"
-    method: timestamp
+    method: checksum
     cmds:
     - clear
-    - make build
-    - ls -lah bin/
     - make tests
     - make lints
+    - make build
+    - ls -lah bin/
 
   testcase: go test -v -failfast -count=1 -run "TestAll/{{ .Case }}" ./...
 
