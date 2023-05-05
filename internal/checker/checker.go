@@ -11,8 +11,8 @@ type Checker struct {
 	Functions map[string]Violation
 	Methods   map[string]map[string]Violation
 
-	fTypes  *types.Info
-	imports []Import
+	types   *types.Info // used for checking types
+	imports []Import    // imports (of current file)
 }
 
 // New will accept a name for package (like `text/template` or `strings`) and
@@ -84,7 +84,7 @@ func (c *Checker) handleViolation(v *Violation, ce *ast.CallExpr) (map[int]ast.E
 			continue
 		}
 
-		if string(v.Targets()) != c.fTypes.TypeOf(call.Args[0]).String() {
+		if string(v.Targets()) != c.types.TypeOf(call.Args[0]).String() {
 			m[i] = call.Args[0]
 		}
 
@@ -93,7 +93,7 @@ func (c *Checker) handleViolation(v *Violation, ce *ast.CallExpr) (map[int]ast.E
 }
 
 func (c *Checker) Type(e ast.Expr) types.Type {
-	return c.fTypes.TypeOf(e)
+	return c.types.TypeOf(e)
 }
 
 // HandleFunction will return Violation for next processing if function/method
@@ -109,10 +109,10 @@ func (c *Checker) HandleFunction(pkgName, methodName string) *Violation {
 }
 
 func (c *Checker) HandleMethod(receiver ast.Expr, method string) *Violation {
-	if c.fTypes == nil || !c.fTypes.Types[receiver].IsValue() {
+	if c.types == nil || !c.types.Types[receiver].IsValue() {
 		return nil
 	}
-	tv := c.fTypes.Types[receiver]
+	tv := c.types.Types[receiver]
 
 	if tv.Type == nil {
 		// todo(butuzov): logError
@@ -151,15 +151,8 @@ func cleanName(name string) string {
 	return name
 }
 
-// -----------------------------------------------------------------------------
-type (
-	// This is type aliases only in order to make code a bit more readable.
-	typesInfo = map[ast.Expr]types.TypeAndValue
-	imports   = []Import
-)
-
-func (c *Checker) With(types *types.Info, i imports) *Checker {
-	c.fTypes = types
+func (c *Checker) With(types *types.Info, i []Import) *Checker {
+	c.types = types
 	c.imports = i
 	return c
 }
