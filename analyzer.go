@@ -20,7 +20,6 @@ type analyzer struct {
 	withTests bool
 	withDebug bool
 
-	lock sync.RWMutex
 	once sync.Once
 }
 
