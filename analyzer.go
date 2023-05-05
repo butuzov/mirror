@@ -60,6 +60,8 @@ func (a *analyzer) run(pass *analysis.Pass) (interface{}, error) {
 	imports := checker.LoadImports(pass.Fset, ins)
 	issues := []*analysis.Diagnostic{}
 
+	debugFn := debugNoOp
+
 	// --- Preorder Checker ------------------------------------------------------
 	ins.Preorder([]ast.Node{(*ast.CallExpr)(nil)}, func(n ast.Node) {
 		callExpr := n.(*ast.CallExpr)
@@ -70,11 +72,15 @@ func (a *analyzer) run(pass *analysis.Pass) (interface{}, error) {
 			return
 		}
 
+		if a.withDebug {
+			debugFn = debug(pass.Fset)
+		}
+
 		fileImports := imports.LookupImports(fileName)
 
 		// Run checkers against call expression.
 		for _, check := range a.checkers {
-			violation := check.With(pass.TypesInfo, fileImports).Check(callExpr)
+			violation := check.With(pass.TypesInfo, fileImports, debugFn).Check(callExpr)
 			if violation != nil {
 				issues = append(issues, violation.Diagnostic(n.Pos(), n.End()))
 			}

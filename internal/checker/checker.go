@@ -13,6 +13,7 @@ type Checker struct {
 
 	types   *types.Info // used for checking types
 	imports []Import    // imports (of current file)
+	debug   func(ast.Expr, string, ...any)
 }
 
 // New will accept a name for package (like `text/template` or `strings`) and
@@ -151,8 +152,9 @@ func cleanName(name string) string {
 	return name
 }
 
-func (c *Checker) With(types *types.Info, i []Import) *Checker {
+func (c *Checker) With(types *types.Info, i []Import, debugFn func(ast.Expr, string, ...any)) *Checker {
 	c.types = types
 	c.imports = i
+	c.debug = debugFn
 	return c
 }
