@@ -17,8 +17,8 @@ tasks:
   regen:
     sources:
     - ./cmd/internal/generate-tests/*.go
-    - ./internal/rules/*.go
-    - ./cmd/internal/generate-tests/tempaltes/*.tmpl
+    - ./checkers_*.go
+    - ./cmd/internal/generate-tests/templates/*.tmpl
     method: timestamp
     cmds:
     - go build -o bin/genrate-tests ./cmd/internal/generate-tests/

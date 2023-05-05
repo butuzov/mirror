@@ -33,6 +33,11 @@ func NewAnalyzer() *analysis.Analyzer {
 			newRegexpChecker(),
 			newStringsChecker(),
 			newBytesChecker(),
+			newMaphashChecker(),
+			newBufioChecker(),
+			newOsChecker(),
+			newUTF8Checker(),
+			newHTTPTestChecker(),
 		},
 	}
 

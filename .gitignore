@@ -3,3 +3,9 @@ coverage.cov
 bin/*
 dist/*
 tmp/*
+out*
+new_funcs*
+demo*
+.task*
+.ipynb*
+.jupyter*

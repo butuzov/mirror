@@ -8,11 +8,6 @@ import (
 	pkg "strings"
 )
 
-var (
-	strings1 Builder
-	strings2 pkg.Builder
-	strings3 strings.Builder
-)
 
 func main_strings() {
 	{
@@ -776,22 +771,22 @@ func main_strings() {
 	}
 
 	{
-		builder := strings.Builder{}
+		builder := Builder{}
 		_,_ = builder.Write([]byte("foobar")) // want `avoid allocations with \(\*strings\.Builder\)\.WriteString`
 	}
 
 	{
-		builder := strings.Builder{}
+		builder := Builder{}
 		_,_ = builder.Write([]byte{'f','o','o','b','a','r'}) 
 	}
 
 	{
-		builder := strings.Builder{}
+		builder := pkg.Builder{}
 		_,_ = builder.Write([]byte("foobar")) // want `avoid allocations with \(\*strings\.Builder\)\.WriteString`
 	}
 
 	{
-		builder := strings.Builder{}
+		builder := pkg.Builder{}
 		_,_ = builder.Write([]byte{'f','o','o','b','a','r'}) 
 	}
 
@@ -806,22 +801,22 @@ func main_strings() {
 	}
 
 	{
-		builder := strings.Builder{}
+		builder := Builder{}
 		_,_ = builder.WriteString(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*strings\.Builder\)\.Write`
 	}
 
 	{
-		builder := strings.Builder{}
+		builder := Builder{}
 		_,_ = builder.WriteString("foobar") 
 	}
 
 	{
-		builder := strings.Builder{}
+		builder := pkg.Builder{}
 		_,_ = builder.WriteString(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*strings\.Builder\)\.Write`
 	}
 
 	{
-		builder := strings.Builder{}
+		builder := pkg.Builder{}
 		_,_ = builder.WriteString("foobar") 
 	}
 

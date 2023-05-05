@@ -39,3 +39,8 @@ install:
 	go install -trimpath -v -ldflags="-w -s" \
 		./cmd/mirror
 
+
+funcs:
+	echo "" > "out/results.txt"
+	go list std | grep -v "vendor" | grep -v "internal" | \
+		xargs -I {} sh -c 'go doc -all {} > out/$(basename {}).txt'

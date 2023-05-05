@@ -285,7 +285,7 @@ var (
 	BytesBufferMethods = map[string]checker.Violation{
 		"Write": {
 			Type:           checker.Method,
-			Message:        "avoid allocations with (*bytees.Buffer).WriteString",
+			Message:        "avoid allocations with (*bytes.Buffer).WriteString",
 			Args:           []int{0},
 			StringTargeted: false,
 			Alternative: checker.Alternative{
@@ -299,7 +299,7 @@ var (
 		},
 		"WriteString": {
 			Type:           checker.Method,
-			Message:        "avoid allocations with (*bytees.Buffer).Write",
+			Message:        "avoid allocations with (*bytes.Buffer).Write",
 			Args:           []int{0},
 			StringTargeted: true,
 			Alternative: checker.Alternative{
