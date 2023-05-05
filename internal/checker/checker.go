@@ -15,9 +15,11 @@ type Checker struct {
 	imports []Import
 }
 
-func New(name string) *Checker {
+// New will accept a name for package (like `text/template` or `strings`) and
+// returns a pointer to initial checker object.
+func New(importedPackage string) *Checker {
 	return &Checker{
-		Package:   name,
+		Package:   importedPackage,
 		Functions: make(map[string]Violation),
 		Methods:   make(map[string]map[string]Violation),
 	}
@@ -32,6 +34,7 @@ func (c *Checker) Check(e *ast.CallExpr) *Violation {
 	// handled by this check
 	case *ast.SelectorExpr:
 		x, ok := expr.X.(*ast.Ident)
+
 		if !ok {
 			return nil // can't be mached, so can't be checked.
 		}
@@ -98,7 +101,7 @@ func (c *Checker) Type(e ast.Expr) types.Type {
 // we indeed have method from imported package.
 func (c *Checker) HandleFunction(pkgName, methodName string) *Violation {
 	m, ok := c.Functions[methodName]
-	if !ok || !c.imported(c.Package, pkgName) {
+	if !ok || !c.isImported(c.Package, pkgName) {
 		return nil
 	}
 
@@ -125,14 +128,14 @@ func (c *Checker) HandleMethod(receiver ast.Expr, method string) *Violation {
 	return nil
 }
 
-// imported will check if package exists in provided imports.
-func (c *Checker) imported(pkg, alias string) bool {
+// isImported will check if package exists in provided imports.
+func (c *Checker) isImported(pkg, name string) bool {
 	if len(c.imports) == 0 {
 		return false
 	}
 
 	for _, v := range c.imports {
-		if v.Val == alias && v.Key == pkg {
+		if v.Pkg == pkg && v.Name == name {
 			return true
 		}
 	}
@@ -158,6 +161,5 @@ type (
 func (c *Checker) With(types *types.Info, i imports) *Checker {
 	c.fTypes = types
 	c.imports = i
-
 	return c
 }

@@ -3,6 +3,7 @@ package checker
 import (
 	"go/ast"
 	"go/token"
+	"path"
 	"sort"
 	"strings"
 	"sync"
@@ -10,9 +11,14 @@ import (
 	"golang.org/x/tools/go/ast/inspector"
 )
 
+// Imports represents an imported package in a nice for lookup way...
+//
+//	examples:
+//	import . "bytes"    -> checker.Import{Pkg:"bytes", Val:"."}
+//	import name "bytes" -> checker.Import{Pkg:"bytes", Val:"name"}
 type Import struct {
-	Key string // package name
-	Val string // alias
+	Pkg  string // package name
+	Name string // alias
 }
 
 type Imports map[string][]Import
@@ -33,30 +39,31 @@ func LoadImports(fs *token.FileSet, ins *inspector.Inspector) Imports {
 
 	// Populate imports map
 	ins.Preorder([]ast.Node{(*ast.ImportSpec)(nil)}, func(node ast.Node) {
-		is, _ := node.(*ast.ImportSpec)
+		importSpec, _ := node.(*ast.ImportSpec)
 
 		var (
-			key   = fs.Position(node.Pos()).Filename
-			name  = strings.Trim(is.Path.Value, `"`)
-			alias = is.Name.String()
+			key  = fs.Position(node.Pos()).Filename
+			pkg  = strings.Trim(importSpec.Path.Value, `"`)
+			name = importSpec.Name.String()
 		)
 
-		if is.Name == nil {
-			alias = name
+		if importSpec.Name == nil {
+			name = path.Base(pkg) // note: we need only basename of the package
 		}
 
 		imports[key] = append(imports[key], Import{
-			Key: name,
-			Val: alias,
+			Pkg:  pkg,
+			Name: name,
 		})
 	})
 
-	imports.Sort()
+	imports.sort()
 
 	return imports
 }
 
-func (i *Imports) Sort() {
+// sort will sort imports for each of the checking files.
+func (i *Imports) sort() {
 	for k := range *i {
 		if len((*i)[k]) < sortLowerLimit {
 			continue
@@ -64,7 +71,7 @@ func (i *Imports) Sort() {
 
 		k := k
 		sort.Slice((*i)[k], func(left, right int) bool {
-			return (*i)[k][left].Val < (*i)[k][right].Val
+			return (*i)[k][left].Name < (*i)[k][right].Name
 		})
 	}
 }

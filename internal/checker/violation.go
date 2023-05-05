@@ -1,7 +1,6 @@
 package checker
 
 import (
-	"fmt"
 	"go/ast"
 	"go/token"
 
@@ -22,10 +21,9 @@ type Violation struct {
 	Message string        // Message on violation detection
 	Args    []int         // Indexes of the arguments needs to be checked
 
-	StringTargeted  bool             // String is expected? []byte otherwise
-	Alternative     Alternative      // Defines names for Diagnostic's Suggestions
-	alternativeArgs map[int]ast.Expr // arguments unwrapped (so we can crate suggestion)
-	Generate        *Generate        // Rules for tests generations
+	StringTargeted bool        // String is expected? []byte otherwise.
+	Alternative    Alternative // Alternative methods/functions to use.
+	Generate       *Generate   // Rules for genetation of tests.
 }
 
 type Alternative struct {
@@ -50,7 +48,6 @@ func (v *Violation) Diagnostic(start, end token.Pos) *analysis.Diagnostic {
 }
 
 func (v *Violation) Handle(ce *ast.CallExpr) (m map[int]ast.Expr, ok bool) {
-	fmt.Println(m)
 	return m, len(m) == len(v.Args)
 }
 
@@ -62,7 +59,8 @@ func (v *Violation) Targets() Type {
 	return String
 }
 
+// TODO: not implemented
 func (v *Violation) WithAltArgs(m map[int]ast.Expr) *Violation {
-	v.alternativeArgs = m
+	// v.alternativeArgs = m
 	return v
 }
