@@ -32,7 +32,7 @@ regexp.MatchString("foo", "foobar1")
 You can get `mirror` with `go install` command.
 
 ```shell
-go install github.com/butuzov/mirror/cmd/mirror
+go install github.com/butuzov/mirror/cmd/mirror@latest
 ```
 
 ## Usage
