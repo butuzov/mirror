@@ -150,7 +150,7 @@ var (
 			Args:           []int{0},
 			StringTargeted: true,
 			Alternative: checker.Alternative{
-				Method: "FindStringIndex",
+				Method: "FindIndex",
 			},
 			Generate: &checker.Generate{
 				PreCondition: `re := regexp.MustCompile(".*")`,
