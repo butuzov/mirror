@@ -34,7 +34,14 @@ func (c *Checker) Check(e *ast.CallExpr) *Violation {
 	// Regular calls (`*ast.SelectorExpr`) like strings.HasPrefix or re.Match are
 	// handled by this check
 	case *ast.SelectorExpr:
+
 		x, ok := expr.X.(*ast.Ident)
+
+		// TODO: add check for the ast.ParenExpr in e.Fun so we can target
+		//       the constructions like this
+		//
+		//       (&maphash.Hash{}).Write([]byte("foobar"))
+		//
 
 		if !ok {
 			return nil // can't be mached, so can't be checked.
@@ -63,7 +70,6 @@ func (c *Checker) Check(e *ast.CallExpr) *Violation {
 				return v.WithAltArgs(argsFixed)
 			}
 		}
-
 	}
 	return nil
 }
@@ -71,25 +77,24 @@ func (c *Checker) Check(e *ast.CallExpr) *Violation {
 func (c *Checker) handleViolation(v *Violation, ce *ast.CallExpr) (map[int]ast.Expr, bool) {
 	m := map[int]ast.Expr{}
 
+	// We going to check each of elements we mark for checking, in order to find,
+	// a call that violates our rules.
 	for _, i := range v.Args {
 		if i >= len(ce.Args) {
 			continue
 		}
 
 		call, ok := ce.Args[i].(*ast.CallExpr)
-		if !ok {
+		if !ok || !c.isConverterCall(call) || len(call.Args) == 0 {
 			continue
 		}
 
-		if t := c.Type(call); t.String() != "string" && t.String() != "[]byte" {
-			continue
-		}
-
-		if string(v.Targets()) != c.types.TypeOf(call.Args[0]).String() {
+		// checking whats argument
+		if v.Targets() != c.Type(call.Args[0]).String() {
 			m[i] = call.Args[0]
 		}
-
 	}
+
 	return m, len(m) == len(v.Args)
 }
 
@@ -110,17 +115,14 @@ func (c *Checker) HandleFunction(pkgName, methodName string) *Violation {
 }
 
 func (c *Checker) HandleMethod(receiver ast.Expr, method string) *Violation {
-	if c.types == nil || !c.types.Types[receiver].IsValue() {
+	if c.types == nil {
 		return nil
 	}
+
 	tv := c.types.Types[receiver]
-
-	if tv.Type == nil {
-		// todo(butuzov): logError
+	if !tv.IsValue() || tv.Type == nil {
 		return nil
-	}
-
-	if methods, ok := c.Methods[cleanName(tv.Type.String())]; !ok {
+	} else if methods, ok := c.Methods[cleanName(tv.Type.String())]; !ok {
 		return nil
 	} else if violation, ok := methods[method]; ok {
 		return &violation
@@ -141,6 +143,17 @@ func (c *Checker) isImported(pkg, name string) bool {
 		}
 	}
 
+	return false
+}
+
+// todo: not implemented
+func (c *Checker) isConverterCall(ce *ast.CallExpr) bool {
+	switch ce.Fun.(type) {
+	case *ast.ArrayType:
+		return c.types.TypeOf(ce.Fun).String() == "[]byte"
+	case *ast.Ident:
+		return c.types.TypeOf(ce.Fun).String() == "string"
+	}
 	return false
 }
 

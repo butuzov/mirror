@@ -51,12 +51,12 @@ func (v *Violation) Handle(ce *ast.CallExpr) (m map[int]ast.Expr, ok bool) {
 	return m, len(m) == len(v.Args)
 }
 
-func (v *Violation) Targets() Type {
+func (v *Violation) Targets() string {
 	if !v.StringTargeted {
-		return Bytes
+		return "[]byte"
 	}
 
-	return String
+	return "string"
 }
 
 // TODO: not implemented
