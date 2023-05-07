@@ -2,7 +2,11 @@ package checker
 
 import (
 	"go/ast"
+	"go/token"
 	"go/types"
+	"strings"
+
+	"golang.org/x/tools/go/analysis"
 )
 
 // Checker will perform standart check on package and its methods
@@ -11,8 +15,9 @@ type Checker struct {
 	Functions map[string]Violation
 	Methods   map[string]map[string]Violation
 
-	types   *types.Info // used for checking types
-	imports []Import    // imports (of current file)
+	types   *types.Info    // used for checking types
+	fset    *token.FileSet // debug info
+	imports []Import       // imports (of current file)
 	debug   func(ast.Expr, string, ...any)
 }
 
@@ -37,9 +42,9 @@ func (c *Checker) Check(e *ast.CallExpr) *Violation {
 
 		x, ok := expr.X.(*ast.Ident)
 
-		// TODO: add check for the ast.ParenExpr in e.Fun so we can target
-		//       the constructions like this
-		//
+		// TODO(butuzov): add check for the ast.ParenExpr in e.Fun so we can target
+		//                the constructions like this
+		// Example:
 		//       (&maphash.Hash{}).Write([]byte("foobar"))
 		//
 
@@ -77,6 +82,8 @@ func (c *Checker) Check(e *ast.CallExpr) *Violation {
 func (c *Checker) handleViolation(v *Violation, ce *ast.CallExpr) (map[int]ast.Expr, bool) {
 	m := map[int]ast.Expr{}
 
+	// any of ce can be a nil
+
 	// We going to check each of elements we mark for checking, in order to find,
 	// a call that violates our rules.
 	for _, i := range v.Args {
@@ -85,21 +92,25 @@ func (c *Checker) handleViolation(v *Violation, ce *ast.CallExpr) (map[int]ast.E
 		}
 
 		call, ok := ce.Args[i].(*ast.CallExpr)
-		if !ok || !c.isConverterCall(call) || len(call.Args) == 0 {
+		if !ok {
+			continue
+		}
+
+		if !c.isConverterCall(call) {
+			continue
+		}
+
+		if len(call.Args) == 0 {
 			continue
 		}
 
 		// checking whats argument
-		if v.Targets() != c.Type(call.Args[0]).String() {
+		if v.Targets() != c.Type(call.Args[0]) {
 			m[i] = call.Args[0]
 		}
 	}
 
 	return m, len(m) == len(v.Args)
-}
-
-func (c *Checker) Type(e ast.Expr) types.Type {
-	return c.types.TypeOf(e)
 }
 
 // HandleFunction will return Violation for next processing if function/method
@@ -122,7 +133,10 @@ func (c *Checker) HandleMethod(receiver ast.Expr, method string) *Violation {
 	tv := c.types.Types[receiver]
 	if !tv.IsValue() || tv.Type == nil {
 		return nil
-	} else if methods, ok := c.Methods[cleanName(tv.Type.String())]; !ok {
+	}
+
+	key, _ := strings.CutPrefix(tv.Type.String(), "*")
+	if methods, ok := c.Methods[key]; !ok {
 		return nil
 	} else if violation, ok := methods[method]; ok {
 		return &violation
@@ -146,28 +160,36 @@ func (c *Checker) isImported(pkg, name string) bool {
 	return false
 }
 
-// todo: not implemented
 func (c *Checker) isConverterCall(ce *ast.CallExpr) bool {
 	switch ce.Fun.(type) {
-	case *ast.ArrayType:
-		return c.types.TypeOf(ce.Fun).String() == "[]byte"
-	case *ast.Ident:
-		return c.types.TypeOf(ce.Fun).String() == "string"
+	case *ast.ArrayType, *ast.Ident:
+		res := c.Type(ce.Fun)
+
+		return res == "[]byte" || res == "string"
 	}
+
 	return false
 }
 
-// cleanName will remove * from the name variable if it is a pointer.
-func cleanName(name string) string {
-	if name[0] == '*' {
-		return name[1:]
+func (c *Checker) Type(node ast.Expr) string {
+	// Sometimes it gives what it all about... sometimes not.
+	if t := c.types.TypeOf(node); t != nil {
+		return t.String()
 	}
-	return name
+
+	if tv, ok := c.types.Types[node]; ok {
+		return tv.Type.Underlying().String()
+	}
+
+	return ""
 }
 
-func (c *Checker) With(types *types.Info, i []Import, debugFn func(ast.Expr, string, ...any)) *Checker {
-	c.types = types
+func (c *Checker) With(pass *analysis.Pass, i []Import, debugFn func(ast.Expr, string, ...any)) *Checker {
+	// pass *analysis.Pass
+	c.fset = pass.Fset
+	c.types = pass.TypesInfo
 	c.imports = i
 	c.debug = debugFn
+
 	return c
 }

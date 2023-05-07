@@ -84,7 +84,7 @@ func main() {
 		tests := []string{}
 		tests = append(tests, generateTests("os", mirror.OsFileMethods)...)
 
-		GenerateTestFile(filepath.Join(testdata, "bufio.go"), "os", tests)
+		GenerateTestFile(filepath.Join(testdata, "os.go"), "os", tests)
 	}
 }
 

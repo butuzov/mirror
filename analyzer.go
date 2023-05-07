@@ -14,8 +14,8 @@ import (
 )
 
 type analyzer struct {
-	checkers []*checker.Checker        // Available checkers.
-	imports  map[string]checker.Import // Map
+	checkers map[string]*checker.Checker // Available checkers.
+	imports  map[string]checker.Import   // Map
 
 	withTests bool
 	withDebug bool
@@ -27,22 +27,22 @@ func NewAnalyzer() *analysis.Analyzer {
 	flags := flags()
 
 	a := analyzer{
-		imports: map[string]checker.Import{},
-		checkers: []*checker.Checker{
-			newRegexpChecker(),
-			newStringsChecker(),
-			newBytesChecker(),
-			newMaphashChecker(),
-			newBufioChecker(),
-			newOsChecker(),
-			newUTF8Checker(),
-			newHTTPTestChecker(),
-		},
+		imports:  map[string]checker.Import{},
+		checkers: make(map[string]*checker.Checker),
 	}
+
+	a.register(newRegexpChecker())
+	a.register(newStringsChecker())
+	a.register(newBytesChecker())
+	a.register(newMaphashChecker())
+	a.register(newBufioChecker())
+	a.register(newOsChecker())
+	a.register(newUTF8Checker())
+	a.register(newHTTPTestChecker())
 
 	return &analysis.Analyzer{
 		Name: "mirror",
-		Doc:  "looks for mirror patterns",
+		Doc:  "reports wrong mirror patterns of bytes/strings usage",
 		Run:  a.run,
 		Requires: []*analysis.Analyzer{
 			inspect.Analyzer,
@@ -52,37 +52,43 @@ func NewAnalyzer() *analysis.Analyzer {
 }
 
 func (a *analyzer) run(pass *analysis.Pass) (interface{}, error) {
-	// --- Setup -----------------------------------------------------------------
+	issues := []*analysis.Diagnostic{}
+	// --- Read the flags --------------------------------------------------------
 	a.once.Do(a.setup(pass.Analyzer.Flags))
 
 	ins, _ := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 
-	imports := checker.LoadImports(pass.Fset, ins)
-	issues := []*analysis.Diagnostic{}
+	// fmt.Println(pass.Pkg.Path())
+	var (
+		imports      = checker.Load(pass.Fset, ins)
+		fileCheckers = make(map[string][]*checker.Checker)
+		debugFn      = debugNoOp
+		fileImports  []checker.Import
+	)
 
-	debugFn := debugNoOp
+	if a.withDebug {
+		debugFn = debug(pass.Fset)
+	}
 
 	// --- Preorder Checker ------------------------------------------------------
 	ins.Preorder([]ast.Node{(*ast.CallExpr)(nil)}, func(n ast.Node) {
 		callExpr := n.(*ast.CallExpr)
 		fileName := pass.Fset.Position(callExpr.Pos()).Filename
 
-		// Reject tests if its not enabled.
 		if !a.withTests && strings.HasSuffix(fileName, "_test.go") {
 			return
 		}
 
-		if a.withDebug {
-			debugFn = debug(pass.Fset)
+		fileImports = imports.Lookup(fileName)
+		if _, ok := fileCheckers[fileName]; !ok {
+			fileCheckers[fileName] = a.filter(fileImports)
 		}
 
-		fileImports := imports.LookupImports(fileName)
-
-		// Run checkers against call expression.
-		for _, check := range a.checkers {
-			violation := check.With(pass.TypesInfo, fileImports, debugFn).Check(callExpr)
-			if violation != nil {
+		for i := range fileCheckers[fileName] {
+			c := fileCheckers[fileName][i].With(pass, fileImports, debugFn)
+			if violation := c.Check(callExpr); violation != nil {
 				issues = append(issues, violation.Diagnostic(n.Pos(), n.End()))
+				return
 			}
 		}
 	})
@@ -93,6 +99,31 @@ func (a *analyzer) run(pass *analysis.Pass) (interface{}, error) {
 	}
 
 	return nil, nil
+}
+
+func (a *analyzer) register(c *checker.Checker) {
+	a.checkers[c.Package] = c
+}
+
+func (a *analyzer) filter(imports []checker.Import) []*checker.Checker {
+	out := make([]*checker.Checker, 0, len(a.checkers))
+	seen := make(map[string]bool, len(imports))
+
+	var key string
+	for i := range imports {
+		key = imports[i].Pkg
+
+		if _, ok := seen[key]; ok {
+			continue
+		}
+		seen[key] = true
+
+		if _, ok := a.checkers[key]; ok {
+			out = append(out, a.checkers[key])
+		}
+	}
+
+	return out
 }
 
 func (a *analyzer) setup(f flag.FlagSet) func() {

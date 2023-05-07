@@ -31,7 +31,7 @@ const sortLowerLimit int = 13
 // Package level lock is to prevent import map corruption
 var lock sync.RWMutex
 
-func LoadImports(fs *token.FileSet, ins *inspector.Inspector) Imports {
+func Load(fs *token.FileSet, ins *inspector.Inspector) Imports {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -76,7 +76,7 @@ func (i *Imports) sort() {
 	}
 }
 
-func (i Imports) LookupImports(file string) []Import {
+func (i Imports) Lookup(file string) []Import {
 	if v, ok := i[file]; ok {
 		return v
 	}
