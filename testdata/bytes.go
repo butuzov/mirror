@@ -162,32 +162,32 @@ func main_bytes() {
 
 	{
 		
-		_ = bytes.ContainsRune([]byte("foobar"), rune('ф')) // want `avoid allocations with strings\.ContainsRune`
+		_ = bytes.ContainsRune([]byte("foobar"), 'ф') // want `avoid allocations with strings\.ContainsRune`
 	}
 
 	{
 		
-		_ = bytes.ContainsRune([]byte{'f','o','o','b','a','r'}, rune('ф')) 
+		_ = bytes.ContainsRune([]byte{'f','o','o','b','a','r'}, 'ф') 
 	}
 
 	{
 		
-		_ = ContainsRune([]byte("foobar"), rune('ф')) // want `avoid allocations with strings\.ContainsRune`
+		_ = ContainsRune([]byte("foobar"), 'ф') // want `avoid allocations with strings\.ContainsRune`
 	}
 
 	{
 		
-		_ = ContainsRune([]byte{'f','o','o','b','a','r'}, rune('ф')) 
+		_ = ContainsRune([]byte{'f','o','o','b','a','r'}, 'ф') 
 	}
 
 	{
 		
-		_ = pkg.ContainsRune([]byte("foobar"), rune('ф')) // want `avoid allocations with strings\.ContainsRune`
+		_ = pkg.ContainsRune([]byte("foobar"), 'ф') // want `avoid allocations with strings\.ContainsRune`
 	}
 
 	{
 		
-		_ = pkg.ContainsRune([]byte{'f','o','o','b','a','r'}, rune('ф')) 
+		_ = pkg.ContainsRune([]byte{'f','o','o','b','a','r'}, 'ф') 
 	}
 
 	{

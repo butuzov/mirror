@@ -92,7 +92,7 @@ var (
 				Function: "ContainsRune",
 			},
 			Generate: &checker.Generate{
-				Pattern: `ContainsRune($0, rune('ф'))`,
+				Pattern: `ContainsRune($0, 'ф')`,
 				Returns: 1,
 			},
 		},
