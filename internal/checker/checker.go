@@ -135,7 +135,7 @@ func (c *Checker) HandleMethod(receiver ast.Expr, method string) *Violation {
 		return nil
 	}
 
-	key, _ := strings.CutPrefix(tv.Type.String(), "*")
+	key := cleanAsterisk(tv.Type.String())
 	if methods, ok := c.Methods[key]; !ok {
 		return nil
 	} else if violation, ok := methods[method]; ok {
@@ -143,6 +143,14 @@ func (c *Checker) HandleMethod(receiver ast.Expr, method string) *Violation {
 	}
 
 	return nil
+}
+
+func cleanAsterisk(s string) string {
+	if strings.HasPrefix(s, "*") {
+		return s[1:]
+	}
+
+	return s
 }
 
 // isImported will check if package exists in provided imports.
