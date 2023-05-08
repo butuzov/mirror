@@ -45,7 +45,7 @@ jobs:
       - name: Coverage - Sending Report to Coveral
         if: matrix.go == '1.20'
         env:
-          COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+          COVERALLS_TOKEN: ${{ secrets.github_token }}
         run: goveralls -coverprofile=coverage.cov -service=github
 
   GolangCILinter:
