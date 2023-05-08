@@ -39,8 +39,16 @@ install:
 	go install -trimpath -v -ldflags="-w -s" \
 		./cmd/mirror
 
-
 funcs:
 	echo "" > "out/results.txt"
 	go list std | grep -v "vendor" | grep -v "internal" | \
 		xargs -I {} sh -c 'go doc -all {} > out/$(basename {}).txt'
+
+bin/goreleaser:
+	@curl -Ls https://github.com/goreleaser/goreleaser/releases/download/v1.17.2/goreleaser_Darwin_all.tar.gz | tar -zOxf - goreleaser > ./bin/goreleaser
+	chmod 0755 ./bin/goreleaser
+
+test-release: bin/goreleaser
+	goreleaser release --help
+	goreleaser release -f .goreleaser.yaml \
+		--skip-validate --skip-publish --clean
