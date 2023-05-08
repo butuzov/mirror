@@ -27,7 +27,7 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         if: ${{ !env.ACT }}
         with:
           path: ~/go/pkg/mod
@@ -49,7 +49,7 @@ jobs:
           COVERALLS_TOKEN: ${{ secrets.github_token }}
         run: goveralls -coverprofile=coverage.cov -service=github
 
-  GolangCILinter:
+  GolangCI_Linter:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
