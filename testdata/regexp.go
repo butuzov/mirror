@@ -8,11 +8,6 @@ import (
 	pkg "regexp"
 )
 
-var (
-	regexp1 Regexp
-	regexp2 pkg.Regexp
-	regexp3 regexp.Regexp
-)
 
 func main_regexp() {
 	{
@@ -86,22 +81,22 @@ func main_regexp() {
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.FindAllIndex([]byte("foobar"), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllStringIndex`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.FindAllIndex([]byte{'f','o','o','b','a','r'}, 1) 
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.FindAllIndex([]byte("foobar"), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllStringIndex`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.FindAllIndex([]byte{'f','o','o','b','a','r'}, 1) 
 	}
 
@@ -116,22 +111,22 @@ func main_regexp() {
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.FindAllStringIndex(string([]byte{'f','o','o','b','a','r'}), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllIndex`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.FindAllStringIndex("foobar", 1) 
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.FindAllStringIndex(string([]byte{'f','o','o','b','a','r'}), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllIndex`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.FindAllStringIndex("foobar", 1) 
 	}
 
@@ -146,22 +141,22 @@ func main_regexp() {
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.FindAllStringSubmatchIndex(string([]byte{'f','o','o','b','a','r'}), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllSubmatchIndex`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.FindAllStringSubmatchIndex("foobar", 1) 
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.FindAllStringSubmatchIndex(string([]byte{'f','o','o','b','a','r'}), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllSubmatchIndex`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.FindAllStringSubmatchIndex("foobar", 1) 
 	}
 
@@ -176,22 +171,22 @@ func main_regexp() {
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.FindAllSubmatchIndex([]byte("foobar"), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllStringSubmatchIndex`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.FindAllSubmatchIndex([]byte{'f','o','o','b','a','r'}, 1) 
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.FindAllSubmatchIndex([]byte("foobar"), 1) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindAllStringSubmatchIndex`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.FindAllSubmatchIndex([]byte{'f','o','o','b','a','r'}, 1) 
 	}
 
@@ -206,22 +201,22 @@ func main_regexp() {
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.FindIndex([]byte("foobar")) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringIndex`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.FindIndex([]byte{'f','o','o','b','a','r'}) 
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.FindIndex([]byte("foobar")) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringIndex`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.FindIndex([]byte{'f','o','o','b','a','r'}) 
 	}
 
@@ -236,22 +231,22 @@ func main_regexp() {
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.FindStringIndex(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringIndex`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.FindStringIndex("foobar") 
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.FindStringIndex(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringIndex`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.FindStringIndex("foobar") 
 	}
 
@@ -266,22 +261,22 @@ func main_regexp() {
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.FindStringSubmatchIndex(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindSubmatchIndex`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.FindStringSubmatchIndex("foobar") 
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.FindStringSubmatchIndex(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindSubmatchIndex`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.FindStringSubmatchIndex("foobar") 
 	}
 
@@ -296,22 +291,22 @@ func main_regexp() {
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.FindSubmatchIndex([]byte("foobar")) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringSubmatchIndex`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.FindSubmatchIndex([]byte{'f','o','o','b','a','r'}) 
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.FindSubmatchIndex([]byte("foobar")) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringSubmatchIndex`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.FindSubmatchIndex([]byte{'f','o','o','b','a','r'}) 
 	}
 
@@ -326,22 +321,22 @@ func main_regexp() {
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.Match([]byte("foobar")) // want `avoid allocations with \(\*regexp\.Regexp\)\.MatchString`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.Match([]byte{'f','o','o','b','a','r'}) 
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.Match([]byte("foobar")) // want `avoid allocations with \(\*regexp\.Regexp\)\.MatchString`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.Match([]byte{'f','o','o','b','a','r'}) 
 	}
 
@@ -356,22 +351,22 @@ func main_regexp() {
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.MatchString(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.Match`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := MustCompile(".*")
 		_ = re.MatchString("foobar") 
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.MatchString(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.Match`
 	}
 
 	{
-		re := regexp.MustCompile(".*")
+		re := pkg.MustCompile(".*")
 		_ = re.MatchString("foobar") 
 	}
 

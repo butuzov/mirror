@@ -1,11 +1,13 @@
-package rules
+package mirror
 
 import "github.com/butuzov/mirror/internal/checker"
 
-func NewRegexpChecker() *checker.Checker {
-	return checker.New("regexp").
-		WithFunctions(RegexpFunctions).
-		WithStructMethods("regexp.Regexp", RegexpRegexpMethods)
+func newRegexpChecker() *checker.Checker {
+	c := checker.New("regexp")
+	c.Functions = RegexpFunctions
+	c.Methods["regexp.Regexp"] = RegexpRegexpMethods
+
+	return c
 }
 
 var (
@@ -148,7 +150,7 @@ var (
 			Args:           []int{0},
 			StringTargeted: true,
 			Alternative: checker.Alternative{
-				Method: "FindStringIndex",
+				Method: "FindIndex",
 			},
 			Generate: &checker.Generate{
 				PreCondition: `re := regexp.MustCompile(".*")`,

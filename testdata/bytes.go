@@ -8,11 +8,6 @@ import (
 	pkg "bytes"
 )
 
-var (
-	bytes1 Buffer
-	bytes2 pkg.Buffer
-	bytes3 bytes.Buffer
-)
 
 func main_bytes() {
 	{
@@ -167,32 +162,32 @@ func main_bytes() {
 
 	{
 		
-		_ = bytes.ContainsRune([]byte("foobar"), rune('ф')) // want `avoid allocations with strings\.ContainsRune`
+		_ = bytes.ContainsRune([]byte("foobar"), 'ф') // want `avoid allocations with strings\.ContainsRune`
 	}
 
 	{
 		
-		_ = bytes.ContainsRune([]byte{'f','o','o','b','a','r'}, rune('ф')) 
+		_ = bytes.ContainsRune([]byte{'f','o','o','b','a','r'}, 'ф') 
 	}
 
 	{
 		
-		_ = ContainsRune([]byte("foobar"), rune('ф')) // want `avoid allocations with strings\.ContainsRune`
+		_ = ContainsRune([]byte("foobar"), 'ф') // want `avoid allocations with strings\.ContainsRune`
 	}
 
 	{
 		
-		_ = ContainsRune([]byte{'f','o','o','b','a','r'}, rune('ф')) 
+		_ = ContainsRune([]byte{'f','o','o','b','a','r'}, 'ф') 
 	}
 
 	{
 		
-		_ = pkg.ContainsRune([]byte("foobar"), rune('ф')) // want `avoid allocations with strings\.ContainsRune`
+		_ = pkg.ContainsRune([]byte("foobar"), 'ф') // want `avoid allocations with strings\.ContainsRune`
 	}
 
 	{
 		
-		_ = pkg.ContainsRune([]byte{'f','o','o','b','a','r'}, rune('ф')) 
+		_ = pkg.ContainsRune([]byte{'f','o','o','b','a','r'}, 'ф') 
 	}
 
 	{
@@ -827,7 +822,7 @@ func main_bytes() {
 
 	{
 		bb := bytes.Buffer{}
-		_,_ = bb.Write([]byte("foobar")) // want `avoid allocations with \(\*bytees\.Buffer\)\.WriteString`
+		_,_ = bb.Write([]byte("foobar")) // want `avoid allocations with \(\*bytes\.Buffer\)\.WriteString`
 	}
 
 	{
@@ -836,28 +831,28 @@ func main_bytes() {
 	}
 
 	{
-		bb := bytes.Buffer{}
-		_,_ = bb.Write([]byte("foobar")) // want `avoid allocations with \(\*bytees\.Buffer\)\.WriteString`
+		bb := Buffer{}
+		_,_ = bb.Write([]byte("foobar")) // want `avoid allocations with \(\*bytes\.Buffer\)\.WriteString`
 	}
 
 	{
-		bb := bytes.Buffer{}
+		bb := Buffer{}
+		_,_ = bb.Write([]byte{'f','o','o','b','a','r'}) 
+	}
+
+	{
+		bb := pkg.Buffer{}
+		_,_ = bb.Write([]byte("foobar")) // want `avoid allocations with \(\*bytes\.Buffer\)\.WriteString`
+	}
+
+	{
+		bb := pkg.Buffer{}
 		_,_ = bb.Write([]byte{'f','o','o','b','a','r'}) 
 	}
 
 	{
 		bb := bytes.Buffer{}
-		_,_ = bb.Write([]byte("foobar")) // want `avoid allocations with \(\*bytees\.Buffer\)\.WriteString`
-	}
-
-	{
-		bb := bytes.Buffer{}
-		_,_ = bb.Write([]byte{'f','o','o','b','a','r'}) 
-	}
-
-	{
-		bb := bytes.Buffer{}
-		_,_ = bb.WriteString(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*bytees\.Buffer\)\.Write`
+		_,_ = bb.WriteString(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*bytes\.Buffer\)\.Write`
 	}
 
 	{
@@ -866,22 +861,22 @@ func main_bytes() {
 	}
 
 	{
-		bb := bytes.Buffer{}
-		_,_ = bb.WriteString(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*bytees\.Buffer\)\.Write`
+		bb := Buffer{}
+		_,_ = bb.WriteString(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*bytes\.Buffer\)\.Write`
 	}
 
 	{
-		bb := bytes.Buffer{}
+		bb := Buffer{}
 		_,_ = bb.WriteString("foobar") 
 	}
 
 	{
-		bb := bytes.Buffer{}
-		_,_ = bb.WriteString(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*bytees\.Buffer\)\.Write`
+		bb := pkg.Buffer{}
+		_,_ = bb.WriteString(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*bytes\.Buffer\)\.Write`
 	}
 
 	{
-		bb := bytes.Buffer{}
+		bb := pkg.Buffer{}
 		_,_ = bb.WriteString("foobar") 
 	}
 

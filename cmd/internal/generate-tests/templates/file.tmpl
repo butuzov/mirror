@@ -8,12 +8,7 @@ import (
 	pkg "{{.Package}}"
 )
 
-var (
-	{{.Package}}1 {{.Struct}}
-	{{.Package}}2 pkg.{{.Struct}}
-	{{.Package}}3 {{.Package}}.{{.Struct}}
-)
 
-func main_{{.Package}}() {
+func main_{{basename .Package}}() {
 {{.Tests}}
 }

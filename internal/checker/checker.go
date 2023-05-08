@@ -1,15 +1,11 @@
 package checker
 
 import (
-	"fmt"
 	"go/ast"
-	"go/printer"
 	"go/token"
 	"go/types"
-	"os"
+	"strings"
 
-	"github.com/butuzov/mirror/internal/imports"
-	"github.com/davecgh/go-spew/spew"
 	"golang.org/x/tools/go/analysis"
 )
 
@@ -19,155 +15,79 @@ type Checker struct {
 	Functions map[string]Violation
 	Methods   map[string]map[string]Violation
 
-	debug   func(ast.Expr)
-	types   map[ast.Expr]types.TypeAndValue
-	imports []imports.KV
-	// temporary fields, assigned to checker just before check.
-	tFset *token.FileSet
-	tPass *analysis.Pass
+	types   *types.Info    // used for checking types
+	fset    *token.FileSet // debug info
+	imports []Import       // imports (of current file)
+	debug   func(ast.Expr, string, ...any)
 }
 
-func New(name string) *Checker {
+// New will accept a name for package (like `text/template` or `strings`) and
+// returns a pointer to initial checker object.
+func New(importedPackage string) *Checker {
 	return &Checker{
-		Package:   name,
+		Package:   importedPackage,
 		Functions: make(map[string]Violation),
 		Methods:   make(map[string]map[string]Violation),
-
-		types: make(map[ast.Expr]types.TypeAndValue),
-		tPass: nil,
 	}
 }
 
-// Debug calls internal debug implementation.
-func (c *Checker) Debug(n ast.Expr) {
-	if c.debug != nil {
-		c.debug(n)
-	}
-}
-
-// WithDebug sets debug function
-func (c *Checker) WithDebug(debugFn func(ast.Expr)) *Checker {
-	c.debug = debugFn
-	return c
-}
-
-// WithFunctions is adding set of functions to be checked.
-func (c *Checker) WithFunctions(m map[string]Violation) *Checker {
-	if m != nil {
-		c.Functions = m
-	}
-	return c
-}
-
-// WithFunctions is adding set of methods of particular struct to be checked.
-func (c *Checker) WithStructMethods(structName string, m map[string]Violation) *Checker {
-	if m != nil {
-		c.Methods[structName] = m
-	}
-	return c
-}
-
-//
-func (rc *Checker) WithTypes(typesInfo map[ast.Expr]types.TypeAndValue) *Checker {
-	rc.types = typesInfo
-	return rc
-}
-
-func (rc *Checker) WithImports(imports []imports.KV) *Checker {
-	rc.imports = imports
-	return rc
-}
-
+// Check perform check on call expression in order to find out can the call
+// expression to be substituted with an alternative method/function.
 func (c *Checker) Check(e *ast.CallExpr) *Violation {
-	switch v := e.Fun.(type) {
+	switch expr := e.Fun.(type) {
+
+	// Regular calls (`*ast.SelectorExpr`) like strings.HasPrefix or re.Match are
+	// handled by this check
 	case *ast.SelectorExpr:
 
-		x, ok := v.X.(*ast.Ident)
+		x, ok := expr.X.(*ast.Ident)
+
+		// TODO(butuzov): add check for the ast.ParenExpr in e.Fun so we can target
+		//                the constructions like this
+		// Example:
+		//       (&maphash.Hash{}).Write([]byte("foobar"))
+		//
+
 		if !ok {
 			return nil // can't be mached, so can't be checked.
 		}
 
 		// does call expression violates diagnostic rule for package function?
-		if d := c.HandleFunction(x.Name, v.Sel.Name); d != nil {
-			if argsFixed, found := c.handleDiagnostic(d, e); found {
-				return d.WithAltArgs(argsFixed)
+		if v := c.HandleFunction(x.Name, expr.Sel.Name); v != nil {
+			if argsFixed, found := c.handleViolation(v, e); found {
+				return v.WithAltArgs(argsFixed)
 			}
 		}
 
 		// does call expression violates diagnostic rule for package struct method?
-		if d := c.HandleMethod(v.X, v.Sel.Name); d != nil {
-			if argsFixed, found := c.handleDiagnostic(d, e); found {
-				return d.WithAltArgs(argsFixed)
+		if v := c.HandleMethod(expr.X, expr.Sel.Name); v != nil {
+			if argsFixed, found := c.handleViolation(v, e); found {
+				return v.WithAltArgs(argsFixed)
 			}
 		}
 
+	// Special case of "." imported packages
 	case *ast.Ident:
-
 		// special case of "." imported package
-		if d := c.HandleFunction(".", v.Name); d != nil {
+		if v := c.HandleFunction(".", expr.Name); v != nil {
 			// does call expression violates diagnostic rule for package function?
-			if argsFixed, found := c.handleDiagnostic(d, e); found {
-				return d.WithAltArgs(argsFixed)
+			if argsFixed, found := c.handleViolation(v, e); found {
+				return v.WithAltArgs(argsFixed)
 			}
 		}
-
 	}
 	return nil
 }
 
-func (c *Checker) HandleMethod(receiver ast.Expr, method string) *Violation {
-	if c.types == nil || !c.types[receiver].IsValue() {
-		return nil
-	}
-	tv := c.types[receiver]
+func (c *Checker) handleViolation(v *Violation, ce *ast.CallExpr) (map[int]ast.Expr, bool) {
+	m := map[int]ast.Expr{}
 
-	if tv.Type == nil {
-		// todo(butuzov): logError
-		return nil
-	}
+	// any of ce can be a nil
 
-	name := tv.Type.String()
-	// strip pointer asterisk if it's a pointer
-	if name[0] == '*' {
-		name = name[1:]
-	}
-
-	if methods, ok := c.Methods[name]; !ok {
-		return nil
-	} else if diagnostic, ok := methods[method]; ok {
-		return &diagnostic
-	}
-
-	return nil
-}
-
-func (c *Checker) HandleFunction(pkgName, methodName string) *Violation {
-	m, ok := c.Functions[methodName]
-	if !ok || !c.hasImport(c.Package, pkgName) {
-		return nil
-	}
-
-	return &m
-}
-
-// handleDiagnostic will return ErrNoIssue if violation not found, and matches found other wise.
-func (c *Checker) handleDiagnostic(d *Violation, ce *ast.CallExpr) (m map[int]ast.Expr, ok bool) {
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Printf("panic: %#v\n", err)
-			fmt.Println("yeap")
-			spew.Dump(d)
-
-			printer.Fprint(os.Stdout, c.tFset, ce)
-			os.Exit(1)
-		}
-	}()
-
-	m = map[int]ast.Expr{}
-
-	maxArgsIdx := len(ce.Args) - 1
-	for _, i := range d.Args {
-		if i > maxArgsIdx {
+	// We going to check each of elements we mark for checking, in order to find,
+	// a call that violates our rules.
+	for _, i := range v.Args {
+		if i >= len(ce.Args) {
 			continue
 		}
 
@@ -176,34 +96,63 @@ func (c *Checker) handleDiagnostic(d *Violation, ce *ast.CallExpr) (m map[int]as
 			continue
 		}
 
-		// this is []byte(foobarString) or string(foobarBytes) ?
-		conv, ok := isConverter(call)
-		if !ok || !conv.Valid() {
+		if !c.isConverterCall(call) {
 			continue
 		}
 
-		// this argument is []byte while we targeting strings
-		if d.StringTargeted && c.Type(conv.Expr().Args[0]) == typeByteSlice {
-			m[i] = conv.Expr().Args[0]
+		if len(call.Args) == 0 {
+			continue
 		}
 
-		// this argument is string while we targeting []byte
-		if !d.StringTargeted && c.Type(conv.Expr().Args[0]) == typeString {
-			m[i] = conv.Expr().Args[0]
+		// checking whats argument
+		if v.Targets() != c.Type(call.Args[0]) {
+			m[i] = call.Args[0]
 		}
 	}
 
-	return m, len(m) == len(d.Args)
+	return m, len(m) == len(v.Args)
 }
 
-// hasImport will check if imports we we have imported pkg as alias?
-func (c *Checker) hasImport(pkg, alias string) (res bool) {
+// HandleFunction will return Violation for next processing if function/method
+// allows to be violated, so we can check its arguments, after confirming that
+// we indeed have method from imported package.
+func (c *Checker) HandleFunction(pkgName, methodName string) *Violation {
+	m, ok := c.Functions[methodName]
+	if !ok || !c.isImported(c.Package, pkgName) {
+		return nil
+	}
+
+	return &m
+}
+
+func (c *Checker) HandleMethod(receiver ast.Expr, method string) *Violation {
+	if c.types == nil {
+		return nil
+	}
+
+	tv := c.types.Types[receiver]
+	if !tv.IsValue() || tv.Type == nil {
+		return nil
+	}
+
+	key, _ := strings.CutPrefix(tv.Type.String(), "*")
+	if methods, ok := c.Methods[key]; !ok {
+		return nil
+	} else if violation, ok := methods[method]; ok {
+		return &violation
+	}
+
+	return nil
+}
+
+// isImported will check if package exists in provided imports.
+func (c *Checker) isImported(pkg, name string) bool {
 	if len(c.imports) == 0 {
 		return false
 	}
 
 	for _, v := range c.imports {
-		if v.Val == alias && v.Key == pkg {
+		if v.Pkg == pkg && v.Name == name {
 			return true
 		}
 	}
@@ -211,31 +160,36 @@ func (c *Checker) hasImport(pkg, alias string) (res bool) {
 	return false
 }
 
-const (
-	// --- string constants for string compare.
-	nameStr  = "string"
-	nameByte = "byte"
-)
+func (c *Checker) isConverterCall(ce *ast.CallExpr) bool {
+	switch ce.Fun.(type) {
+	case *ast.ArrayType, *ast.Ident:
+		res := c.Type(ce.Fun)
 
-func consistsOfBytes(a *ast.ArrayType) bool {
-	i, ok := a.Elt.(*ast.Ident)
-	if !ok {
-		return false
+		return res == "[]byte" || res == "string"
 	}
 
-	hasByteElemType := i.Name == nameByte
-	return hasByteElemType
+	return false
 }
 
-func indentIsString(i *ast.Ident) bool {
-	hasStringAsName := i.Name == nameStr
-	return hasStringAsName
+func (c *Checker) Type(node ast.Expr) string {
+	// Sometimes it gives what it all about... sometimes not.
+	if t := c.types.TypeOf(node); t != nil {
+		return t.String()
+	}
+
+	if tv, ok := c.types.Types[node]; ok {
+		return tv.Type.Underlying().String()
+	}
+
+	return ""
 }
 
-func NewSuggestedFix(fixes ...analysis.TextEdit) analysis.SuggestedFix {
-	var fix analysis.SuggestedFix
+func (c *Checker) With(pass *analysis.Pass, i []Import, debugFn func(ast.Expr, string, ...any)) *Checker {
+	// pass *analysis.Pass
+	c.fset = pass.Fset
+	c.types = pass.TypesInfo
+	c.imports = i
+	c.debug = debugFn
 
-	fix.TextEdits = append(fix.TextEdits, fixes...)
-
-	return fix
+	return c
 }

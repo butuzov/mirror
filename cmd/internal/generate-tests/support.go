@@ -138,7 +138,6 @@ func makeFuncInline(pattern string, replaces []string) string {
 func generateTests(pkgName string, list map[string]checker.Violation) []string {
 	var tests []string
 
-	// order of the functions
 	keys := make([]string, 0, len(list))
 	for k := range list {
 		keys = append(keys, k)
@@ -156,7 +155,6 @@ func generateTests(pkgName string, list map[string]checker.Violation) []string {
 
 		for _, pkg := range PkgImports(pkgName) {
 			for _, variance := range PossibleVariations(len(test.Args)) {
-
 				wantStr := ""
 				if !strings.Contains(variance, "0") {
 					wantStr = QuoteRegexp(test.Message)
@@ -164,26 +162,34 @@ func generateTests(pkgName string, list map[string]checker.Violation) []string {
 
 				var b1 bytes.Buffer
 
-				{
-					pkgInTest := pkg
-					if test.Generate.PreCondition != "" {
-						pkgInTest = strings.Trim(strings.Split(test.Generate.PreCondition, ":=")[0], " ")
+				pkgInTest := pkg
+				preCondition := test.Generate.PreCondition
+				if test.Generate.PreCondition != "" {
+					pkgInTest = strings.Trim(strings.Split(test.Generate.PreCondition, ":=")[0], " ")
+
+					alt := pkg + "."
+					if strings.Trim(pkg, " ") == "" {
+						alt = ""
 					}
 
-					templates.ExecuteTemplate(&b1, "case.tmpl", TestCase{
-						Arguments: []string{},
-						Returns:   GenReturnelements(test.Generate.Returns),
-						Package:   pkgInTest,
-						PreCond:   test.Generate.PreCondition,
-						Func:      makeFuncInline(test.Generate.Pattern, variate(variance, test.StringTargeted)),
-						Want:      wantStr,
-					})
-					tests = append(tests, b1.String())
-					b1.Reset()
+					preCondition = strings.Replace(preCondition, pkgName+".", alt, -1)
+
 				}
 
+				templates.ExecuteTemplate(&b1, "case.tmpl", TestCase{
+					Arguments: []string{},
+					Returns:   GenReturnelements(test.Generate.Returns),
+					Package:   pkgInTest,
+					PreCond:   preCondition,
+					Func:      makeFuncInline(test.Generate.Pattern, variate(variance, test.StringTargeted)),
+					Want:      wantStr,
+				})
+
+				tests = append(tests, b1.String())
+				b1.Reset()
 			}
 		}
+
 	}
 
 	return tests

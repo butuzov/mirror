@@ -1,11 +1,13 @@
-package rules
+package mirror
 
 import "github.com/butuzov/mirror/internal/checker"
 
-func NewBytesChecker() *checker.Checker {
-	return checker.New("bytes").
-		WithFunctions(BytesFunctions).
-		WithStructMethods("bytes.Buffer", BytesBufferMethods)
+func newBytesChecker() *checker.Checker {
+	c := checker.New("bytes")
+	c.Functions = BytesFunctions
+	c.Methods["bytes.Buffer"] = BytesBufferMethods
+
+	return c
 }
 
 var (
@@ -90,7 +92,7 @@ var (
 				Function: "ContainsRune",
 			},
 			Generate: &checker.Generate{
-				Pattern: `ContainsRune($0, rune('ф'))`,
+				Pattern: `ContainsRune($0, 'ф')`,
 				Returns: 1,
 			},
 		},
@@ -283,7 +285,7 @@ var (
 	BytesBufferMethods = map[string]checker.Violation{
 		"Write": {
 			Type:           checker.Method,
-			Message:        "avoid allocations with (*bytees.Buffer).WriteString",
+			Message:        "avoid allocations with (*bytes.Buffer).WriteString",
 			Args:           []int{0},
 			StringTargeted: false,
 			Alternative: checker.Alternative{
@@ -297,7 +299,7 @@ var (
 		},
 		"WriteString": {
 			Type:           checker.Method,
-			Message:        "avoid allocations with (*bytees.Buffer).Write",
+			Message:        "avoid allocations with (*bytes.Buffer).Write",
 			Args:           []int{0},
 			StringTargeted: true,
 			Alternative: checker.Alternative{

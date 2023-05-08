@@ -9,4 +9,3 @@ import (
 func TestAll(t *testing.T) {
 	analysistest.Run(t, analysistest.TestData(), NewAnalyzer())
 }
-
