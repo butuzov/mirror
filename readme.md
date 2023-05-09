@@ -32,7 +32,7 @@ func IsValidHostname(hostname string, fqdn bool) bool {
 ## Install
 
 ```
-go install github.com/butuzov/mirrror/cmd/mirror@latest
+go install github.com/butuzov/mirror/cmd/mirror@latest
 ```
 
 ## How to use
