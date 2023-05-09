@@ -19,9 +19,9 @@ type TestCase struct {
 	Want      string
 }
 
-// variate will create a set of variables to use within test fucntion
+// variate will create a set of variables to use within test function
 // if its a string function/method
-// -> correct: all strins expected
+// -> correct: all strings expected
 //
 // -> incorrect -> bytes ex
 func variate(variance string, oneIsString bool) []string {
@@ -31,7 +31,7 @@ func variate(variance string, oneIsString bool) []string {
 	for i := 0; i < len(variance); i++ {
 		var input string
 
-		// if out argument is in string we gona take argument that is
+		// if out argument is in string we gonna take argument that is
 		if oneIsString {
 			input = `"foobar"`
 		} else {
@@ -95,7 +95,7 @@ func GenReturnelements(n int) string {
 	return string(ret)
 }
 
-// possible varialtions for arguments
+// possible variations for arguments
 func PossibleVariations(n int) []string {
 	if n <= 1 {
 		return []string{"1", "0"}

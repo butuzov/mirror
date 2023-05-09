@@ -7,7 +7,7 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
-// Type of violation: can be methodor function
+// Type of violation: can be method or function
 type ViolationType int
 
 const (
@@ -15,7 +15,7 @@ const (
 	Method
 )
 
-// Violation describs what message we going to give to a particular code violation
+// Violation describes what message we going to give to a particular code violation
 type Violation struct {
 	Type    ViolationType // What type is violation? Method or Function?
 	Message string        // Message on violation detection
@@ -23,7 +23,7 @@ type Violation struct {
 
 	StringTargeted bool        // String is expected? []byte otherwise.
 	Alternative    Alternative // Alternative methods/functions to use.
-	Generate       *Generate   // Rules for genetation of tests.
+	Generate       *Generate   // Rules for generation of tests.
 }
 
 type Alternative struct {
