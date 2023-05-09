@@ -36,7 +36,7 @@ go install github.com/butuzov/mirror/cmd/mirror@latest
 ```
 
 ### `golangci-lint`
-`golangci-lint` support `mirro` since `v1.53.0`
+`golangci-lint` supports `mirror` since `v1.53.0`
 
 
 ## How to use
