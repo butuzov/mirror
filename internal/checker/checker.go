@@ -49,7 +49,7 @@ func (c *Checker) Check(e *ast.CallExpr) *Violation {
 		//
 
 		if !ok {
-			return nil // can't be mached, so can't be checked.
+			return nil // can't be matched, so can't be checked.
 		}
 
 		// does call expression violates diagnostic rule for package function?

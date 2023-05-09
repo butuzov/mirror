@@ -1,6 +1,6 @@
 # `mirror` [![Code Coverage](https://coveralls.io/repos/github/butuzov/mirror/badge.svg?branch=main)](https://coveralls.io/github/butuzov/mirror?branch=main) [![build status](https://github.com/butuzov/mirror/actions/workflows/main.yaml/badge.svg?branch=main)]()
 
-`mirror` suggests use of alternative functions/methods in order to gain performance boosts by avoiding unnecessary `[]byte/string` convertion calls. See [MIRROR_FUNCS.md](MIRROR_FUNCS.md) list of mirror functions you can use in go's stdlib.
+`mirror` suggests use of alternative functions/methods in order to gain performance boosts by avoiding unnecessary `[]byte/string` conversion calls. See [MIRROR_FUNCS.md](MIRROR_FUNCS.md) list of mirror functions you can use in go's stdlib.
 
 ## 🇺🇦 PLEASE HELP ME 🇺🇦
 Fundrise for scout drone **DJI Matrice 30T** for my squad (Ukrainian Forces). See more details at [butuzov/README.md](https://github.com/butuzov/butuzov/)
