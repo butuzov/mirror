@@ -15,7 +15,6 @@ import (
 
 type analyzer struct {
 	checkers map[string]*checker.Checker // Available checkers.
-	imports  map[string]checker.Import   // Map
 
 	withTests bool
 	withDebug bool
@@ -27,7 +26,6 @@ func NewAnalyzer() *analysis.Analyzer {
 	flags := flags()
 
 	a := analyzer{
-		imports:  map[string]checker.Import{},
 		checkers: make(map[string]*checker.Checker),
 	}
 
