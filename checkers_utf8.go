@@ -2,151 +2,134 @@ package mirror
 
 import "github.com/butuzov/mirror/internal/checker"
 
-func newUTF8Checker() *checker.Checker {
-	c := checker.New("unicode/utf8")
-	c.Functions = UTF8Functions
+var UTF8Functions = []checker.Violation{
+	{ // utf8.Valid
+		Type:      checker.Function,
+		Targets:   checker.Bytes,
+		Package:   "unicode/utf8",
+		Caller:    "Valid",
+		Args:      []int{0},
+		AltCaller: "ValidString",
 
-	return c
-}
-
-var UTF8Functions = map[string]checker.Violation{
-	"Valid": {
-		Type:           checker.Function,
-		Message:        "avoid allocations with utf8.ValidString",
-		Args:           []int{0},
-		StringTargeted: false,
-		Alternative: checker.Alternative{
-			Package:  "unicode/utf8",
-			Function: "ValidString",
-		},
 		Generate: &checker.Generate{
 			Pattern: `Valid($0)`,
 			Returns: 1,
 		},
 	},
-	"ValidString": {
-		Type:           checker.Function,
-		Message:        "avoid allocations with utf8.Valid",
-		Args:           []int{0},
-		StringTargeted: true,
-		Alternative: checker.Alternative{
-			Package:  "unicode/utf8",
-			Function: "Valid",
-		},
+	{ // utf8.ValidString
+		Targets:   checker.Strings,
+		Type:      checker.Function,
+		Package:   "unicode/utf8",
+		Caller:    "ValidString",
+		Args:      []int{0},
+		AltCaller: "Valid",
+
 		Generate: &checker.Generate{
 			Pattern: `ValidString($0)`,
 			Returns: 1,
 		},
 	},
-	"FullRune": {
-		Type:           checker.Function,
-		Message:        "avoid allocations with utf8.FullRuneInString",
-		Args:           []int{0},
-		StringTargeted: false,
-		Alternative: checker.Alternative{
-			Package:  "unicode/utf8",
-			Function: "FullRuneInString",
-		},
+	{ // utf8.FullRune
+		Targets:   checker.Bytes,
+		Type:      checker.Function,
+		Package:   "unicode/utf8",
+		Caller:    "FullRune",
+		Args:      []int{0},
+		AltCaller: "FullRuneInString",
+
 		Generate: &checker.Generate{
 			Pattern: `FullRune($0)`,
 			Returns: 1,
 		},
 	},
-	"FullRuneInString": {
-		Type:           checker.Function,
-		Message:        "avoid allocations with utf8.FullRune",
-		Args:           []int{0},
-		StringTargeted: true,
-		Alternative: checker.Alternative{
-			Package:  "unicode/utf8",
-			Function: "FullRune",
-		},
+	{ // utf8.FullRuneInString
+		Targets:   checker.Strings,
+		Type:      checker.Function,
+		Package:   "unicode/utf8",
+		Caller:    "FullRuneInString",
+		Args:      []int{0},
+		AltCaller: "FullRune",
+
 		Generate: &checker.Generate{
 			Pattern: `FullRuneInString($0)`,
 			Returns: 1,
 		},
 	},
 
-	"RuneCount": {
-		Type:           checker.Function,
-		Message:        "avoid allocations with utf8.RuneCountInString",
-		Args:           []int{0},
-		StringTargeted: false,
-		Alternative: checker.Alternative{
-			Package:  "unicode/utf8",
-			Function: "RuneCountInString",
-		},
+	{ // bytes.RuneCount
+		Targets:   checker.Bytes,
+		Type:      checker.Function,
+		Package:   "unicode/utf8",
+		Caller:    "RuneCount",
+		Args:      []int{0},
+		AltCaller: "RuneCountInString",
+
 		Generate: &checker.Generate{
 			Pattern: `RuneCount($0)`,
 			Returns: 1,
 		},
 	},
-	"RuneCountInString": {
-		Type:           checker.Function,
-		Message:        "avoid allocations with utf8.RuneCount",
-		Args:           []int{0},
-		StringTargeted: true,
-		Alternative: checker.Alternative{
-			Package:  "unicode/utf8",
-			Function: "RuneCount",
-		},
+	{ // bytes.RuneCountInString
+		Targets:   checker.Strings,
+		Type:      checker.Function,
+		Package:   "unicode/utf8",
+		Caller:    "RuneCountInString",
+		Args:      []int{0},
+		AltCaller: "RuneCount",
+
 		Generate: &checker.Generate{
 			Pattern: `RuneCountInString($0)`,
 			Returns: 1,
 		},
 	},
 
-	"DecodeLastRune": {
-		Type:           checker.Function,
-		Message:        "avoid allocations with utf8.DecodeLastRuneInString",
-		Args:           []int{0},
-		StringTargeted: false,
-		Alternative: checker.Alternative{
-			Package:  "unicode/utf8",
-			Function: "DecodeLastRuneInString",
-		},
+	{ // bytes.DecodeLastRune
+		Targets:   checker.Bytes,
+		Type:      checker.Function,
+		Package:   "unicode/utf8",
+		Caller:    "DecodeLastRune",
+		Args:      []int{0},
+		AltCaller: "DecodeLastRuneInString",
+
 		Generate: &checker.Generate{
 			Pattern: `DecodeLastRune($0)`,
 			Returns: 2,
 		},
 	},
-	"DecodeLastRuneInString": {
-		Type:           checker.Function,
-		Message:        "avoid allocations with utf8.DecodeLastRune",
-		Args:           []int{0},
-		StringTargeted: true,
-		Alternative: checker.Alternative{
-			Package:  "unicode/utf8",
-			Function: "DecodeLastRune",
-		},
+	{ // utf8.DecodeLastRuneInString
+		Targets:   checker.Strings,
+		Type:      checker.Function,
+		Package:   "unicode/utf8",
+		Caller:    "DecodeLastRuneInString",
+		Args:      []int{0},
+		AltCaller: "DecodeLastRune",
+
 		Generate: &checker.Generate{
 			Pattern: `DecodeLastRuneInString($0)`,
 			Returns: 2,
 		},
 	},
-	"DecodeRune": {
-		Type:           checker.Function,
-		Message:        "avoid allocations with utf8.DecodeRuneInString",
-		Args:           []int{0},
-		StringTargeted: false,
-		Alternative: checker.Alternative{
-			Package:  "unicode/utf8",
-			Function: "DecodeRuneInString",
-		},
+	{ // utf8.DecodeRune
+		Targets:   checker.Bytes,
+		Type:      checker.Function,
+		Package:   "unicode/utf8",
+		Caller:    "DecodeRune",
+		Args:      []int{0},
+		AltCaller: "DecodeRuneInString",
+
 		Generate: &checker.Generate{
 			Pattern: `DecodeRune($0)`,
 			Returns: 2,
 		},
 	},
-	"DecodeRuneInString": {
-		Type:           checker.Function,
-		Message:        "avoid allocations with utf8.DecodeRune",
-		Args:           []int{0},
-		StringTargeted: true,
-		Alternative: checker.Alternative{
-			Package:  "unicode/utf8",
-			Function: "DecodeRune",
-		},
+	{ // utf8.DecodeRuneInString
+		Targets:   checker.Strings,
+		Type:      checker.Function,
+		Package:   "unicode/utf8",
+		Args:      []int{0},
+		Caller:    "DecodeRuneInString",
+		AltCaller: "DecodeRune",
+
 		Generate: &checker.Generate{
 			Pattern: `DecodeRuneInString($0)`,
 			Returns: 2,

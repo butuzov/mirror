@@ -14,8 +14,6 @@ import (
 )
 
 type analyzer struct {
-	checkers map[string]*checker.Checker // Available checkers.
-
 	withTests bool
 	withDebug bool
 
@@ -25,18 +23,7 @@ type analyzer struct {
 func NewAnalyzer() *analysis.Analyzer {
 	flags := flags()
 
-	a := analyzer{
-		checkers: make(map[string]*checker.Checker),
-	}
-
-	a.register(newRegexpChecker())
-	a.register(newStringsChecker())
-	a.register(newBytesChecker())
-	a.register(newMaphashChecker())
-	a.register(newBufioChecker())
-	a.register(newOsChecker())
-	a.register(newUTF8Checker())
-	a.register(newHTTPTestChecker())
+	a := analyzer{}
 
 	return &analysis.Analyzer{
 		Name: "mirror",
@@ -50,78 +37,115 @@ func NewAnalyzer() *analysis.Analyzer {
 }
 
 func (a *analyzer) run(pass *analysis.Pass) (interface{}, error) {
-	issues := []*analysis.Diagnostic{}
-	// --- Read the flags --------------------------------------------------------
-	a.once.Do(a.setup(pass.Analyzer.Flags))
+	// --- Setup -----------------------------------------------------------------
 
-	ins, _ := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
-
-	// fmt.Println(pass.Pkg.Path())
-	var (
-		imports      = checker.Load(pass.Fset, ins)
-		fileCheckers = make(map[string][]*checker.Checker)
-		debugFn      = debugNoOp
-		fileImports  []checker.Import
+	check := checker.New(
+		BytesFunctions,
+		BytesBufferMethods,
+		BytesFunctions,
+		BytesBufferMethods,
+		BufioMethods,
+		HTTPTestMethods,
+		OsFileMethods,
+		RegexpFunctions,
+		RegexpRegexpMethods,
+		StringFunctions,
+		StringsBuilderMethods,
+		MaphashMethods,
+		UTF8Functions,
 	)
 
-	if a.withDebug {
-		debugFn = debug(pass.Fset)
+	check.Type = func(node ast.Expr) string {
+		if t := pass.TypesInfo.TypeOf(node); t != nil {
+			return t.String()
+		}
+
+		if tv, ok := pass.TypesInfo.Types[node]; ok {
+			return tv.Type.Underlying().String()
+		}
+
+		return ""
 	}
+
+	violations := []*checker.Violation{}
+
+	a.once.Do(a.setup(pass.Analyzer.Flags)) // loading flags info
+
+	ins, _ := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
+	imports := checker.Load(pass.Fset, ins)
 
 	// --- Preorder Checker ------------------------------------------------------
 	ins.Preorder([]ast.Node{(*ast.CallExpr)(nil)}, func(n ast.Node) {
-		callExpr := n.(*ast.CallExpr)
+		callExpr := n.(*ast.CallExpr) //nolint: forcetypeassert
 		fileName := pass.Fset.Position(callExpr.Pos()).Filename
 
 		if !a.withTests && strings.HasSuffix(fileName, "_test.go") {
 			return
 		}
 
-		fileImports = imports.Lookup(fileName)
-		if _, ok := fileCheckers[fileName]; !ok {
-			fileCheckers[fileName] = a.filter(fileImports)
-		}
+		// -------------------------------------------------------------------------
+		switch expr := callExpr.Fun.(type) {
+		// NOTE(butuzov): Regular calls (`*ast.SelectorExpr`) like strings.HasPrefix
+		//                or re.Match are handled by this check
+		case *ast.SelectorExpr:
 
-		for i := range fileCheckers[fileName] {
-			c := fileCheckers[fileName][i].With(pass, fileImports, debugFn)
-			if violation := c.Check(callExpr); violation != nil {
-				issues = append(issues, violation.Diagnostic(n.Pos(), n.End()))
+			x, ok := expr.X.(*ast.Ident)
+			if !ok {
 				return
+			}
+
+			// TODO(butuzov): Add check for the ast.ParenExpr in e.Fun so we can
+			//                target the constructions like this (and other calls)
+			// -----------------------------------------------------------------------
+			// Example:
+			//       (&maphash.Hash{}).Write([]byte("foobar"))
+			// -----------------------------------------------------------------------
+
+			// Case 1: Is this is a function call?
+			pkgName, name := x.Name, expr.Sel.Name
+			if pkg, ok := imports.Lookup(fileName, pkgName); ok {
+				if v := check.Match(pkg, name); v != nil {
+					if args, found := check.Handle(v, callExpr); found {
+						violations = append(violations, v.With(callExpr, args))
+					}
+					return
+				}
+			}
+
+			// Case 2: Is this is a method call?
+			tv := pass.TypesInfo.Types[expr.X]
+			if !tv.IsValue() || tv.Type == nil {
+				return
+			}
+
+			pkgStruct, name := cleanAsterisk(tv.Type.String()), expr.Sel.Name
+			if v := check.Match(pkgStruct, name); v != nil {
+				if args, found := check.Handle(v, callExpr); found {
+					violations = append(violations, v.With(callExpr, args))
+				}
+				return
+			}
+
+		case *ast.Ident:
+			// NOTE(butuzov): Special case of "." imported packages, only functions.
+
+			if pkg, ok := imports.Lookup(fileName, "."); ok {
+				if v := check.Match(pkg, expr.Name); v != nil {
+					if args, found := check.Handle(v, callExpr); found {
+						violations = append(violations, v.With(callExpr, args))
+					}
+					return
+				}
 			}
 		}
 	})
 
-	// --- Reporting issues ------------------------------------------------------
-	for _, issue := range issues {
-		pass.Report(*issue)
+	// --- Reporting violations via issues ---------------------------------------
+	for _, violation := range violations {
+		pass.Report(violation.Issue())
 	}
 
 	return nil, nil
-}
-
-func (a *analyzer) register(c *checker.Checker) {
-	a.checkers[c.Package] = c
-}
-
-func (a *analyzer) filter(imports []checker.Import) []*checker.Checker {
-	out := make([]*checker.Checker, 0, len(a.checkers))
-	seen := make(map[string]bool, len(imports))
-
-	var key string
-	for i := range imports {
-		key = imports[i].Pkg
-
-		if _, ok := seen[key]; ok {
-			continue
-		}
-		seen[key] = true
-
-		if _, ok := a.checkers[key]; ok {
-			out = append(out, a.checkers[key])
-		}
-	}
-
-	return out
 }
 
 func (a *analyzer) setup(f flag.FlagSet) func() {
@@ -136,4 +160,12 @@ func flags() flag.FlagSet {
 	set.Bool("with-tests", false, "do not skip tests in reports")
 	set.Bool("with-debug", false, "debug linter run (development only)")
 	return *set
+}
+
+func cleanAsterisk(s string) string {
+	if strings.HasPrefix(s, "*") {
+		return s[1:]
+	}
+
+	return s
 }

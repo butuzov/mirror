@@ -732,7 +732,7 @@ func main_strings() {
 
 	{
 		
-		_ = strings.LastIndexFunc(string([]byte{'f','o','o','b','a','r'}), func(r rune) bool { return true }) // want `avoid allocations with bytes\.LastIndexAny`
+		_ = strings.LastIndexFunc(string([]byte{'f','o','o','b','a','r'}), func(r rune) bool { return true }) // want `avoid allocations with bytes\.LastIndexFunc`
 	}
 
 	{
@@ -742,7 +742,7 @@ func main_strings() {
 
 	{
 		
-		_ = LastIndexFunc(string([]byte{'f','o','o','b','a','r'}), func(r rune) bool { return true }) // want `avoid allocations with bytes\.LastIndexAny`
+		_ = LastIndexFunc(string([]byte{'f','o','o','b','a','r'}), func(r rune) bool { return true }) // want `avoid allocations with bytes\.LastIndexFunc`
 	}
 
 	{
@@ -752,7 +752,7 @@ func main_strings() {
 
 	{
 		
-		_ = pkg.LastIndexFunc(string([]byte{'f','o','o','b','a','r'}), func(r rune) bool { return true }) // want `avoid allocations with bytes\.LastIndexAny`
+		_ = pkg.LastIndexFunc(string([]byte{'f','o','o','b','a','r'}), func(r rune) bool { return true }) // want `avoid allocations with bytes\.LastIndexFunc`
 	}
 
 	{

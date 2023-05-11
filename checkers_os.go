@@ -2,36 +2,31 @@ package mirror
 
 import "github.com/butuzov/mirror/internal/checker"
 
-func newOsChecker() *checker.Checker {
-	c := checker.New("os")
-	c.Methods["os.File"] = OsFileMethods
+var OsFileMethods = []checker.Violation{
+	{ // (*os.File).Write
+		Targets:   checker.Bytes,
+		Type:      checker.Method,
+		Package:   "os",
+		Struct:    "File",
+		Caller:    "Write",
+		Args:      []int{0},
+		AltCaller: "WriteString",
 
-	return c
-}
-
-var OsFileMethods = map[string]checker.Violation{
-	"Write": {
-		Type:           checker.Method,
-		Message:        "avoid allocations with (*os.File).WriteString",
-		Args:           []int{0},
-		StringTargeted: false,
-		Alternative: checker.Alternative{
-			Method: "WriteString",
-		},
 		Generate: &checker.Generate{
 			PreCondition: `f := &os.File{}`,
 			Pattern:      `Write($0)`,
 			Returns:      2,
 		},
 	},
-	"WriteString": {
-		Type:           checker.Method,
-		Message:        "avoid allocations with (*os.File).Write",
-		Args:           []int{0},
-		StringTargeted: true,
-		Alternative: checker.Alternative{
-			Method: "Write",
-		},
+	{ // (*os.File).WriteString
+		Targets:   checker.Strings,
+		Type:      checker.Method,
+		Package:   "os",
+		Struct:    "File",
+		Caller:    "WriteString",
+		Args:      []int{0},
+		AltCaller: "Write",
+
 		Generate: &checker.Generate{
 			PreCondition: `f := &os.File{}`,
 			Pattern:      `WriteString($0)`,
