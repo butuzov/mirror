@@ -40,32 +40,16 @@ func (a *analyzer) run(pass *analysis.Pass) (interface{}, error) {
 	// --- Setup -----------------------------------------------------------------
 
 	check := checker.New(
-		BytesFunctions,
-		BytesBufferMethods,
-		BytesFunctions,
-		BytesBufferMethods,
-		BufioMethods,
-		HTTPTestMethods,
-		OsFileMethods,
-		RegexpFunctions,
-		RegexpRegexpMethods,
-		StringFunctions,
-		StringsBuilderMethods,
-		MaphashMethods,
+		BytesFunctions, BytesBufferMethods,
+		RegexpFunctions, RegexpRegexpMethods,
+		StringFunctions, StringsBuilderMethods,
+		BufioMethods, HTTPTestMethods,
+		OsFileMethods, MaphashMethods,
 		UTF8Functions,
 	)
 
-	check.Type = func(node ast.Expr) string {
-		if t := pass.TypesInfo.TypeOf(node); t != nil {
-			return t.String()
-		}
-
-		if tv, ok := pass.TypesInfo.Types[node]; ok {
-			return tv.Type.Underlying().String()
-		}
-
-		return ""
-	}
+	check.Type = checker.WrapType(pass.TypesInfo)
+	check.Print = checker.WrapPrint(pass.Fset)
 
 	violations := []*checker.Violation{}
 
@@ -76,7 +60,7 @@ func (a *analyzer) run(pass *analysis.Pass) (interface{}, error) {
 
 	// --- Preorder Checker ------------------------------------------------------
 	ins.Preorder([]ast.Node{(*ast.CallExpr)(nil)}, func(n ast.Node) {
-		callExpr := n.(*ast.CallExpr) //nolint: forcetypeassert
+		callExpr := n.(*ast.CallExpr)
 		fileName := pass.Fset.Position(callExpr.Pos()).Filename
 
 		if !a.withTests && strings.HasSuffix(fileName, "_test.go") {
@@ -106,7 +90,7 @@ func (a *analyzer) run(pass *analysis.Pass) (interface{}, error) {
 			if pkg, ok := imports.Lookup(fileName, pkgName); ok {
 				if v := check.Match(pkg, name); v != nil {
 					if args, found := check.Handle(v, callExpr); found {
-						violations = append(violations, v.With(callExpr, args))
+						violations = append(violations, v.With(check.Print(expr.X), callExpr, args))
 					}
 					return
 				}
@@ -121,7 +105,7 @@ func (a *analyzer) run(pass *analysis.Pass) (interface{}, error) {
 			pkgStruct, name := cleanAsterisk(tv.Type.String()), expr.Sel.Name
 			if v := check.Match(pkgStruct, name); v != nil {
 				if args, found := check.Handle(v, callExpr); found {
-					violations = append(violations, v.With(callExpr, args))
+					violations = append(violations, v.With(check.Print(expr.X), callExpr, args))
 				}
 				return
 			}
@@ -132,7 +116,7 @@ func (a *analyzer) run(pass *analysis.Pass) (interface{}, error) {
 			if pkg, ok := imports.Lookup(fileName, "."); ok {
 				if v := check.Match(pkg, expr.Name); v != nil {
 					if args, found := check.Handle(v, callExpr); found {
-						violations = append(violations, v.With(callExpr, args))
+						violations = append(violations, v.With(nil, callExpr, args))
 					}
 					return
 				}
@@ -142,7 +126,7 @@ func (a *analyzer) run(pass *analysis.Pass) (interface{}, error) {
 
 	// --- Reporting violations via issues ---------------------------------------
 	for _, violation := range violations {
-		pass.Report(violation.Issue())
+		pass.Report(violation.Issue(pass.Fset))
 	}
 
 	return nil, nil

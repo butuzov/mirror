@@ -1,8 +1,11 @@
 package checker
 
 import (
+	"bytes"
 	"fmt"
 	"go/ast"
+	"go/printer"
+	"go/token"
 	"path"
 
 	"golang.org/x/tools/go/analysis"
@@ -37,8 +40,9 @@ type Violation struct {
 	Generate *Generate
 
 	// --- suggestions related info about violation of rules.
-	callExpr  *ast.CallExpr
-	arguments map[int]ast.Expr
+	base      []byte           // receiver of the method or pkg name
+	callExpr  *ast.CallExpr    // actual call expression, to extract arguments
+	arguments map[int]ast.Expr // fixed arguments
 }
 
 // Tests (generation) related struct.
@@ -48,68 +52,12 @@ type Generate struct {
 	Returns      int    // Expected to return n elements
 }
 
-// func (v *Violation) Diagnostic(fset *token.FileSet, n *ast.CallExpr) *analysis.Diagnostic {
-// 	diagnostic := &analysis.Diagnostic{
-// 		Pos:     n.Pos(),
-// 		End:     n.Pos(),
-// 		Message: v.Message,
-// 	}
+func (v *Violation) With(base []byte, e *ast.CallExpr, args map[int]ast.Expr) *Violation {
+	v.base = base
+	v.callExpr = e
+	v.arguments = args
 
-// 	if b := v.suggestion(fset, n); len(b) > 0 {
-// 		diagnostic.SuggestedFixes = []analysis.SuggestedFix{{
-// 			Message:   "",
-// 			TextEdits: []analysis.TextEdit{{Pos: n.Pos(), End: n.End(), NewText: b}},
-// 		}}
-
-// 		fmt.Println(">>>", string(b))
-// 	}
-
-// 	return diagnostic
-// }
-
-// // nolint: revive
-// func (v *Violation) suggestion(fset *token.FileSet, n *ast.CallExpr) []byte {
-// 	var buf bytes.Buffer
-
-// 	changeCall := func(buf *bytes.Buffer, base, alternative string) []byte {
-// 		buf.WriteString(base)
-// 		buf.WriteString(".")
-// 		buf.WriteString(alternative)
-// 		buf.WriteString("(")
-
-// 		for i := range n.Args {
-// 			if arg, ok := v.arguments.args[i]; ok {
-// 				printer.Fprint(buf, fset, arg)
-// 			} else {
-// 				printer.Fprint(buf, fset, n.Args[i])
-// 			}
-
-// 			if i != len(n.Args)-1 {
-// 				buf.WriteString(", ")
-// 			}
-// 		}
-
-// 		buf.WriteString(")")
-// 		return buf.Bytes()
-// 	}
-
-// 	// is it method call?
-// 	if len(v.arguments.obj) > 0 {
-// 		return changeCall(&buf, v.arguments.obj, v.Alternative.Method)
-// 	}
-
-// 	// Old And New imports (and names) needs to be resolved.
-
-// 	// rest of cases.
-// 	return changeCall(&buf, v.arguments.pkg, v.Alternative.Function)
-// }
-
-func (v *Violation) With(e *ast.CallExpr, args map[int]ast.Expr) *Violation {
-	v2 := (*v)
-	v2.callExpr = e
-	v2.arguments = args
-
-	return &v2
+	return v
 }
 
 func (v *Violation) Message() string {
@@ -126,20 +74,62 @@ func (v *Violation) Message() string {
 	return fmt.Sprintf("avoid allocations with %s.%s", path.Base(pkg), v.AltCaller)
 }
 
-func (v *Violation) Issue() analysis.Diagnostic {
+func (v *Violation) suggest(fSet *token.FileSet) []byte {
+	var buf bytes.Buffer
+
+	if len(v.base) > 0 {
+		buf.Write(v.base)
+		buf.WriteString(".")
+	}
+
+	buf.WriteString(v.AltCaller)
+	buf.WriteByte('(')
+	for idx := range v.callExpr.Args {
+		if arg, ok := v.arguments[idx]; ok {
+			printer.Fprint(&buf, fSet, arg)
+		} else {
+			printer.Fprint(&buf, fSet, v.callExpr.Args[idx])
+		}
+
+		if idx != len(v.callExpr.Args)-1 {
+			buf.WriteString(", ")
+		}
+	}
+	buf.WriteByte(')')
+
+	return buf.Bytes()
+}
+
+func (v *Violation) Issue(fSet *token.FileSet) analysis.Diagnostic {
 	diagnostic := analysis.Diagnostic{
 		Pos:     v.callExpr.Pos(),
 		End:     v.callExpr.Pos(),
 		Message: v.Message(),
 	}
 
+	// fmt.Println(string(v.suggest(fSet)))
+
+	// Struct based fix.
 	if v.Type == Method {
-		return diagnostic
+		diagnostic.SuggestedFixes = []analysis.SuggestedFix{{
+			Message: "Fix Issue With",
+			TextEdits: []analysis.TextEdit{{
+				Pos: v.callExpr.Pos(), End: v.callExpr.End(), NewText: v.suggest(fSet),
+			}},
+		}}
 	}
 
-	// fmt.Println("package", c.Package)
-	// fmt.Println("target methods ?", v.Type == Method)
-	// fmt.Println("alternative", v.Alt)
+	// Hooray! we dont need to change package and redo imports.
+	if v.Type == Function && len(v.AltPackage) == 0 {
+		diagnostic.SuggestedFixes = []analysis.SuggestedFix{{
+			Message: "Fix Issue With",
+			TextEdits: []analysis.TextEdit{{
+				Pos: v.callExpr.Pos(), End: v.callExpr.End(), NewText: v.suggest(fSet),
+			}},
+		}}
+	}
+
+	// do not change
 
 	return diagnostic
 }

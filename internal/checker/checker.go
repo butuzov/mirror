@@ -1,7 +1,11 @@
 package checker
 
 import (
+	"bytes"
 	"go/ast"
+	"go/printer"
+	"go/token"
+	"go/types"
 	"strings"
 )
 
@@ -9,7 +13,8 @@ import (
 type Checker struct {
 	Violations []Violation           // List of available violations
 	Packages   map[string][]int      // Storing indexes of Violations per pkg/kg.Struct
-	Type       func(ast.Expr) string // Closure for the
+	Type       func(ast.Expr) string // Type Checker closure.
+	Print      func(ast.Node) []byte // String representation of the expresion.
 }
 
 func New(violations ...[]Violation) Checker {
@@ -108,4 +113,26 @@ func (c *Checker) register(violations []Violation) {
 // under pkg string.
 func (c *Checker) registerIdxPer(pkg string) {
 	c.Packages[pkg] = append(c.Packages[pkg], len(c.Violations)-1)
+}
+
+func WrapType(info *types.Info) func(node ast.Expr) string {
+	return func(node ast.Expr) string {
+		if t := info.TypeOf(node); t != nil {
+			return t.String()
+		}
+
+		if tv, ok := info.Types[node]; ok {
+			return tv.Type.Underlying().String()
+		}
+
+		return ""
+	}
+}
+
+func WrapPrint(fSet *token.FileSet) func(ast.Node) []byte {
+	return func(node ast.Node) []byte {
+		var buf bytes.Buffer
+		printer.Fprint(&buf, fSet, node)
+		return buf.Bytes()
+	}
 }
