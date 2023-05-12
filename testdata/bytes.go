@@ -732,7 +732,7 @@ func main_bytes() {
 
 	{
 		
-		_ = bytes.LastIndexFunc([]byte("foobar"), func(rune) bool {return true }) // want `avoid allocations with strings\.LastIndexAny`
+		_ = bytes.LastIndexFunc([]byte("foobar"), func(rune) bool {return true }) // want `avoid allocations with strings\.LastIndexFunc`
 	}
 
 	{
@@ -742,7 +742,7 @@ func main_bytes() {
 
 	{
 		
-		_ = LastIndexFunc([]byte("foobar"), func(rune) bool {return true }) // want `avoid allocations with strings\.LastIndexAny`
+		_ = LastIndexFunc([]byte("foobar"), func(rune) bool {return true }) // want `avoid allocations with strings\.LastIndexFunc`
 	}
 
 	{
@@ -752,7 +752,7 @@ func main_bytes() {
 
 	{
 		
-		_ = pkg.LastIndexFunc([]byte("foobar"), func(rune) bool {return true }) // want `avoid allocations with strings\.LastIndexAny`
+		_ = pkg.LastIndexFunc([]byte("foobar"), func(rune) bool {return true }) // want `avoid allocations with strings\.LastIndexFunc`
 	}
 
 	{

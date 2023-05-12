@@ -2,279 +2,268 @@ package mirror
 
 import "github.com/butuzov/mirror/internal/checker"
 
-func newBytesChecker() *checker.Checker {
-	c := checker.New("bytes")
-	c.Functions = BytesFunctions
-	c.Methods["bytes.Buffer"] = BytesBufferMethods
-
-	return c
-}
-
 var (
-	BytesFunctions = map[string]checker.Violation{
-		"NewBuffer": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with bytes.NewBufferString",
-			Args:           []int{0},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "bytes",
-				Function: "NewBufferString",
-			},
+	BytesFunctions = []checker.Violation{
+		{ // bytes.NewBuffer
+			Targets:   checker.Bytes,
+			Type:      checker.Function,
+			Package:   "bytes",
+			Caller:    "NewBuffer",
+			Args:      []int{0},
+			AltCaller: "NewBufferString",
+
 			Generate: &checker.Generate{
 				Pattern: `NewBuffer($0)`,
 				Returns: 1,
 			},
 		},
-		"NewBufferString": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with bytes.NewBuffer",
-			Args:           []int{0},
-			StringTargeted: true,
-			Alternative: checker.Alternative{
-				Package:  "bytes",
-				Function: "NewBuffer",
-			},
+		{ // bytes.NewBufferString
+			Targets:   checker.Strings,
+			Type:      checker.Function,
+			Package:   "bytes",
+			Caller:    "NewBufferString",
+			Args:      []int{0},
+			AltCaller: "NewBuffer",
+
 			Generate: &checker.Generate{
 				Pattern: `NewBufferString($0)`,
 				Returns: 1,
 			},
 		},
-		"Compare": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with strings.Compare",
-			Args:           []int{0, 1},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "strings",
-				Function: "Compare",
-			},
+		{ // bytes.Compare:
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "Compare",
+			Args:       []int{0, 1},
+			AltPackage: "strings",
+			AltCaller:  "Compare",
+
 			Generate: &checker.Generate{
 				Pattern: `Compare($0, $1)`,
 				Returns: 1,
 			},
 		},
-		"Contains": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with strings.Contains",
-			Args:           []int{0, 1},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "strings",
-				Function: "Contains",
-			},
+		{ // bytes.Contains:
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "Contains",
+			Args:       []int{0, 1},
+			AltPackage: "strings",
+			AltCaller:  "Contains",
+
 			Generate: &checker.Generate{
 				Pattern: `Contains($0, $1)`,
 				Returns: 1,
 			},
 		},
-		"ContainsAny": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with strings.ContainsAny",
-			Args:           []int{0},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "strings",
-				Function: "ContainsAny",
-			},
+		{ // bytes.ContainsAny
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "ContainsAny",
+			Args:       []int{0},
+			AltPackage: "strings",
+			AltCaller:  "ContainsAny",
+
 			Generate: &checker.Generate{
 				Pattern: `ContainsAny($0, "f")`,
 				Returns: 1,
 			},
 		},
-		"ContainsRune": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with strings.ContainsRune",
-			Args:           []int{0},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "strings",
-				Function: "ContainsRune",
-			},
+		{ // bytes.ContainsRune
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "ContainsRune",
+			Args:       []int{0},
+			AltPackage: "strings",
+			AltCaller:  "ContainsRune",
+
 			Generate: &checker.Generate{
 				Pattern: `ContainsRune($0, 'ф')`,
 				Returns: 1,
 			},
 		},
-		"Count": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with strings.Count",
-			Args:           []int{0, 1},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "strings",
-				Function: "Count",
-			},
+		{ // bytes.Count
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "Count",
+			Args:       []int{0, 1},
+			AltPackage: "strings",
+			AltCaller:  "Count",
+
 			Generate: &checker.Generate{
 				Pattern: `Count($0, $1)`,
 				Returns: 1,
 			},
 		},
-		"EqualFold": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with strings.EqualFold",
-			Args:           []int{0, 1},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "strings",
-				Function: "EqualFold",
-			},
+		{ // bytes.EqualFold
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "EqualFold",
+			Args:       []int{0, 1},
+			AltPackage: "strings",
+			AltCaller:  "EqualFold",
+
 			Generate: &checker.Generate{
 				Pattern: `EqualFold($0, $1)`,
 				Returns: 1,
 			},
 		},
 
-		"HasPrefix": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with strings.HasPrefix",
-			Args:           []int{0, 1},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "strings",
-				Function: "HasPrefix",
-			},
+		{ // bytes.HasPrefix
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "HasPrefix",
+			Args:       []int{0, 1},
+			AltPackage: "strings",
+			AltCaller:  "HasPrefix",
+
 			Generate: &checker.Generate{
 				Pattern: `HasPrefix($0, $1)`,
 				Returns: 1,
 			},
 		},
-		"HasSuffix": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with strings.HasSuffix",
-			Args:           []int{0, 1},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "strings",
-				Function: "HasSuffix",
-			},
+		{ // bytes.HasSuffix
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "HasSuffix",
+			Args:       []int{0, 1},
+			AltPackage: "strings",
+			AltCaller:  "HasSuffix",
+
 			Generate: &checker.Generate{
 				Pattern: `HasSuffix($0, $1)`,
 				Returns: 1,
 			},
 		},
-		"Index": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with strings.Index",
-			Args:           []int{0, 1},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "strings",
-				Function: "Index",
-			},
+		{ // bytes.Index
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "Index",
+			Args:       []int{0, 1},
+			AltPackage: "strings",
+			AltCaller:  "Index",
+
 			Generate: &checker.Generate{
 				Pattern: `Index($0, $1)`,
 				Returns: 1,
 			},
 		},
-		"IndexAny": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with strings.IndexAny",
-			Args:           []int{0},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "strings",
-				Function: "IndexAny",
-			},
+		{ // bytes.IndexAny
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "IndexAny",
+			Args:       []int{0},
+			AltPackage: "strings",
+			AltCaller:  "IndexAny",
+
 			Generate: &checker.Generate{
 				Pattern: `IndexAny($0, "f")`,
 				Returns: 1,
 			},
 		},
-		"IndexByte": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with strings.IndexByte",
-			Args:           []int{0},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "strings",
-				Function: "IndexByte",
-			},
+		{ // bytes.IndexByte
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "IndexByte",
+			Args:       []int{0},
+			AltPackage: "strings",
+			AltCaller:  "IndexByte",
+
 			Generate: &checker.Generate{
 				Pattern: `IndexByte($0, 'f')`,
 				Returns: 1,
 			},
 		},
-		"IndexFunc": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with strings.IndexFunc",
-			Args:           []int{0},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "strings",
-				Function: "IndexFunc",
-			},
+		{ // bytes.IndexFunc
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "IndexFunc",
+			Args:       []int{0},
+			AltPackage: "strings",
+			AltCaller:  "IndexFunc",
+
 			Generate: &checker.Generate{
 				Pattern: `IndexFunc($0, func(rune) bool {return true })`,
 				Returns: 1,
 			},
 		},
-		"IndexRune": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with strings.IndexRune",
-			Args:           []int{0},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "strings",
-				Function: "IndexRune",
-			},
+		{ // bytes.IndexRune
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "IndexRune",
+			Args:       []int{0},
+			AltPackage: "strings",
+			AltCaller:  "IndexRune",
+
 			Generate: &checker.Generate{
 				Pattern: `IndexRune($0, rune('ф'))`,
 				Returns: 1,
 			},
 		},
-		"LastIndex": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with strings.LastIndex",
-			Args:           []int{0, 1},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "strings",
-				Function: "LastIndex",
-			},
+		{ // bytes.LastIndex
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "LastIndex",
+			Args:       []int{0, 1},
+			AltPackage: "strings",
+			AltCaller:  "LastIndex",
+
 			Generate: &checker.Generate{
 				Pattern: `LastIndex($0, $1)`,
 				Returns: 1,
 			},
 		},
-		"LastIndexAny": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with strings.LastIndexAny",
-			Args:           []int{0},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "strings",
-				Function: "LastIndexAny",
-			},
+		{ // bytes.LastIndexAny
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "LastIndexAny",
+			Args:       []int{0},
+			AltPackage: "strings",
+			AltCaller:  "LastIndexAny",
+
 			Generate: &checker.Generate{
 				Pattern: `LastIndexAny($0, "ф")`,
 				Returns: 1,
 			},
 		},
+		{ // bytes.LastIndexByte
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "LastIndexByte",
+			Args:       []int{0},
+			AltPackage: "strings",
+			AltCaller:  "LastIndexByte",
 
-		"LastIndexByte": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with strings.LastIndexByte",
-			Args:           []int{0},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "strings",
-				Function: "LastIndexByte",
-			},
 			Generate: &checker.Generate{
 				Pattern: `LastIndexByte($0, 'f')`,
 				Returns: 1,
 			},
 		},
-		"LastIndexFunc": {
-			Type:           checker.Function,
-			Message:        "avoid allocations with strings.LastIndexAny",
-			Args:           []int{0},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Package:  "strings",
-				Function: "LastIndexAny",
-			},
+		{ // bytes.LastIndexFunc
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "LastIndexFunc",
+			Args:       []int{0},
+			AltPackage: "strings",
+			AltCaller:  "LastIndexFunc",
+
 			Generate: &checker.Generate{
 				Pattern: `LastIndexFunc($0, func(rune) bool {return true })`,
 				Returns: 1,
@@ -282,29 +271,31 @@ var (
 		},
 	}
 
-	BytesBufferMethods = map[string]checker.Violation{
-		"Write": {
-			Type:           checker.Method,
-			Message:        "avoid allocations with (*bytes.Buffer).WriteString",
-			Args:           []int{0},
-			StringTargeted: false,
-			Alternative: checker.Alternative{
-				Method: "WriteString",
-			},
+	BytesBufferMethods = []checker.Violation{
+		{ // (*bytes.Buffer).Write
+			Targets:   checker.Bytes,
+			Type:      checker.Method,
+			Package:   "bytes",
+			Struct:    "Buffer",
+			Caller:    "Write",
+			Args:      []int{0},
+			AltCaller: "WriteString",
+
 			Generate: &checker.Generate{
 				PreCondition: `bb := bytes.Buffer{}`,
 				Pattern:      `Write($0)`,
 				Returns:      2,
 			},
 		},
-		"WriteString": {
-			Type:           checker.Method,
-			Message:        "avoid allocations with (*bytes.Buffer).Write",
-			Args:           []int{0},
-			StringTargeted: true,
-			Alternative: checker.Alternative{
-				Method: "Write",
-			},
+		{ // (*bytes.Buffer).WriteString
+			Targets:   checker.Strings,
+			Type:      checker.Method,
+			Package:   "bytes",
+			Struct:    "Buffer",
+			Caller:    "WriteString",
+			Args:      []int{0},
+			AltCaller: "Write",
+
 			Generate: &checker.Generate{
 				PreCondition: `bb := bytes.Buffer{}`,
 				Pattern:      `WriteString($0)`,

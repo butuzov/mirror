@@ -76,10 +76,14 @@ func (i *Imports) sort() {
 	}
 }
 
-func (i Imports) Lookup(file string) []Import {
-	if v, ok := i[file]; ok {
-		return v
+func (i Imports) Lookup(file, pkg string) (string, bool) {
+	if _, ok := i[file]; ok {
+		for idx := range i[file] {
+			if i[file][idx].Name == pkg {
+				return i[file][idx].Pkg, true
+			}
+		}
 	}
 
-	return nil
+	return "", false
 }

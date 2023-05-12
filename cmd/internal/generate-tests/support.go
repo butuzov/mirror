@@ -135,18 +135,15 @@ func makeFuncInline(pattern string, replaces []string) string {
 	return pattern
 }
 
-func generateTests(pkgName string, list map[string]checker.Violation) []string {
+func generateTests(pkgName string, list []checker.Violation) []string {
 	var tests []string
 
-	keys := make([]string, 0, len(list))
-	for k := range list {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
+	sort.Slice(list, func(i, j int) bool {
+		return list[i].Caller < list[j].Caller
+	})
 
 	// tests variance
-	for _, key := range keys {
-		test := list[key]
+	for _, test := range list {
 
 		if test.Generate == nil || test.Generate.Pattern == "" {
 			log.Printf("required fields not supported: %#v\n", test)
@@ -157,10 +154,10 @@ func generateTests(pkgName string, list map[string]checker.Violation) []string {
 			for _, variance := range PossibleVariations(len(test.Args)) {
 				wantStr := ""
 				if !strings.Contains(variance, "0") {
-					wantStr = QuoteRegexp(test.Message)
+					wantStr = QuoteRegexp(test.Message())
 				}
 
-				var b1 bytes.Buffer
+				var buf bytes.Buffer
 
 				pkgInTest := pkg
 				preCondition := test.Generate.PreCondition
@@ -176,17 +173,18 @@ func generateTests(pkgName string, list map[string]checker.Violation) []string {
 
 				}
 
-				templates.ExecuteTemplate(&b1, "case.tmpl", TestCase{
+				templates.ExecuteTemplate(&buf, "case.tmpl", TestCase{
 					Arguments: []string{},
 					Returns:   GenReturnelements(test.Generate.Returns),
 					Package:   pkgInTest,
 					PreCond:   preCondition,
-					Func:      makeFuncInline(test.Generate.Pattern, variate(variance, test.StringTargeted)),
-					Want:      wantStr,
+					Func: makeFuncInline(test.Generate.Pattern,
+						variate(variance, test.Targets == checker.Strings)),
+					Want: wantStr,
 				})
 
-				tests = append(tests, b1.String())
-				b1.Reset()
+				tests = append(tests, buf.String())
+				buf.Reset()
 			}
 		}
 

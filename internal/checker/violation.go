@@ -1,8 +1,12 @@
 package checker
 
 import (
+	"bytes"
+	"fmt"
 	"go/ast"
+	"go/printer"
 	"go/token"
+	"path"
 
 	"golang.org/x/tools/go/analysis"
 )
@@ -15,21 +19,30 @@ const (
 	Method
 )
 
-// Violation describes what message we going to give to a particular code violation
+const (
+	Strings string = "string"
+	Bytes   string = "[]byte"
+)
+
+// Violation describs what message we going to give to a particular code violation
 type Violation struct {
-	Type    ViolationType // What type is violation? Method or Function?
-	Message string        // Message on violation detection
-	Args    []int         // Indexes of the arguments needs to be checked
+	Type ViolationType //
+	Args []int         // Indexes of the arguments needs to be checked
 
-	StringTargeted bool        // String is expected? []byte otherwise.
-	Alternative    Alternative // Alternative methods/functions to use.
-	Generate       *Generate   // Rules for generation of tests.
-}
+	Targets    string
+	Package    string
+	AltPackage string
+	Struct     string
+	Caller     string
+	AltCaller  string
 
-type Alternative struct {
-	Package  string
-	Function string
-	Method   string
+	// --- tests generation information
+	Generate *Generate
+
+	// --- suggestions related info about violation of rules.
+	base      []byte           // receiver of the method or pkg name
+	callExpr  *ast.CallExpr    // actual call expression, to extract arguments
+	arguments map[int]ast.Expr // fixed arguments
 }
 
 // Tests (generation) related struct.
@@ -39,28 +52,84 @@ type Generate struct {
 	Returns      int    // Expected to return n elements
 }
 
-func (v *Violation) Diagnostic(start, end token.Pos) *analysis.Diagnostic {
-	return &analysis.Diagnostic{
-		Pos:     start,
-		End:     end,
-		Message: v.Message,
-	}
-}
+func (v *Violation) With(base []byte, e *ast.CallExpr, args map[int]ast.Expr) *Violation {
+	v.base = base
+	v.callExpr = e
+	v.arguments = args
 
-func (v *Violation) Handle(ce *ast.CallExpr) (m map[int]ast.Expr, ok bool) {
-	return m, len(m) == len(v.Args)
-}
-
-func (v *Violation) Targets() string {
-	if !v.StringTargeted {
-		return "[]byte"
-	}
-
-	return "string"
-}
-
-// TODO: not implemented
-func (v *Violation) WithAltArgs(m map[int]ast.Expr) *Violation {
-	// v.alternativeArgs = m
 	return v
+}
+
+func (v *Violation) Message() string {
+	if v.Type == Method {
+		return fmt.Sprintf("avoid allocations with (*%s.%s).%s",
+			path.Base(v.Package), v.Struct, v.AltCaller)
+	}
+
+	pkg := v.Package
+	if len(v.AltPackage) > 0 {
+		pkg = v.AltPackage
+	}
+
+	return fmt.Sprintf("avoid allocations with %s.%s", path.Base(pkg), v.AltCaller)
+}
+
+func (v *Violation) suggest(fSet *token.FileSet) []byte {
+	var buf bytes.Buffer
+
+	if len(v.base) > 0 {
+		buf.Write(v.base)
+		buf.WriteString(".")
+	}
+
+	buf.WriteString(v.AltCaller)
+	buf.WriteByte('(')
+	for idx := range v.callExpr.Args {
+		if arg, ok := v.arguments[idx]; ok {
+			printer.Fprint(&buf, fSet, arg)
+		} else {
+			printer.Fprint(&buf, fSet, v.callExpr.Args[idx])
+		}
+
+		if idx != len(v.callExpr.Args)-1 {
+			buf.WriteString(", ")
+		}
+	}
+	buf.WriteByte(')')
+
+	return buf.Bytes()
+}
+
+func (v *Violation) Issue(fSet *token.FileSet) analysis.Diagnostic {
+	diagnostic := analysis.Diagnostic{
+		Pos:     v.callExpr.Pos(),
+		End:     v.callExpr.Pos(),
+		Message: v.Message(),
+	}
+
+	// fmt.Println(string(v.suggest(fSet)))
+
+	// Struct based fix.
+	if v.Type == Method {
+		diagnostic.SuggestedFixes = []analysis.SuggestedFix{{
+			Message: "Fix Issue With",
+			TextEdits: []analysis.TextEdit{{
+				Pos: v.callExpr.Pos(), End: v.callExpr.End(), NewText: v.suggest(fSet),
+			}},
+		}}
+	}
+
+	// Hooray! we dont need to change package and redo imports.
+	if v.Type == Function && len(v.AltPackage) == 0 {
+		diagnostic.SuggestedFixes = []analysis.SuggestedFix{{
+			Message: "Fix Issue With",
+			TextEdits: []analysis.TextEdit{{
+				Pos: v.callExpr.Pos(), End: v.callExpr.End(), NewText: v.suggest(fSet),
+			}},
+		}}
+	}
+
+	// do not change
+
+	return diagnostic
 }

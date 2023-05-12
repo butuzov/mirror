@@ -9,6 +9,10 @@ build:
 	@ go build -trimpath -ldflags="-w -s" \
 		-o bin/mirror ./cmd/mirror/
 
+build-race:
+	@ go build -race -trimpath -ldflags="-w -s" \
+		-o bin/mirror ./cmd/mirror/
+
 tests:
 	go test -v -count=1 -race \
 		-failfast \
@@ -25,7 +29,7 @@ tests-summary:
 		-covermode=atomic \
 		-coverpkg=$(GOPKGS) -coverprofile=coverage.cov --json ./... | tparse -all
 
-generate:
+test-generate:
 	go run ./cmd/internal/generate-tests/ "$(PWD)/testdata"
 
 lints:

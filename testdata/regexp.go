@@ -222,7 +222,7 @@ func main_regexp() {
 
 	{
 		re := regexp.MustCompile(".*")
-		_ = re.FindStringIndex(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringIndex`
+		_ = re.FindStringIndex(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindIndex`
 	}
 
 	{
@@ -232,7 +232,7 @@ func main_regexp() {
 
 	{
 		re := MustCompile(".*")
-		_ = re.FindStringIndex(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringIndex`
+		_ = re.FindStringIndex(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindIndex`
 	}
 
 	{
@@ -242,7 +242,7 @@ func main_regexp() {
 
 	{
 		re := pkg.MustCompile(".*")
-		_ = re.FindStringIndex(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindStringIndex`
+		_ = re.FindStringIndex(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with \(\*regexp\.Regexp\)\.FindIndex`
 	}
 
 	{
