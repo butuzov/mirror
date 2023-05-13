@@ -100,17 +100,19 @@ func (v *Violation) suggest(fSet *token.FileSet) []byte {
 	return buf.Bytes()
 }
 
-func (v *Violation) Issue(fSet *token.FileSet) analysis.Diagnostic {
+func (v *Violation) Diagnostic(fSet *token.FileSet) analysis.Diagnostic {
 	diagnostic := analysis.Diagnostic{
 		Pos:     v.callExpr.Pos(),
 		End:     v.callExpr.Pos(),
 		Message: v.Message(),
 	}
 
-	// fmt.Println(string(v.suggest(fSet)))
+	var buf bytes.Buffer
+	printer.Fprint(&buf, fSet, v.callExpr)
+	noNl := bytes.IndexByte(buf.Bytes(), '\n') < 0
 
 	// Struct based fix.
-	if v.Type == Method {
+	if v.Type == Method && noNl {
 		diagnostic.SuggestedFixes = []analysis.SuggestedFix{{
 			Message: "Fix Issue With",
 			TextEdits: []analysis.TextEdit{{
@@ -119,8 +121,12 @@ func (v *Violation) Issue(fSet *token.FileSet) analysis.Diagnostic {
 		}}
 	}
 
+	if v.AltPackage == "" {
+		v.AltPackage = v.Package
+	}
+
 	// Hooray! we dont need to change package and redo imports.
-	if v.Type == Function && len(v.AltPackage) == 0 {
+	if v.Type == Function && v.AltPackage == v.Package && noNl {
 		diagnostic.SuggestedFixes = []analysis.SuggestedFix{{
 			Message: "Fix Issue With",
 			TextEdits: []analysis.TextEdit{{
