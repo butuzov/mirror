@@ -7,6 +7,7 @@ import (
 	"go/printer"
 	"go/token"
 	"path"
+	"strings"
 
 	"golang.org/x/tools/go/analysis"
 )
@@ -138,4 +139,45 @@ func (v *Violation) Diagnostic(fSet *token.FileSet) analysis.Diagnostic {
 	// do not change
 
 	return diagnostic
+}
+
+type GolangIssue struct {
+	Start     token.Position
+	End       token.Position
+	Message   string
+	InlineFix string
+	Original  string
+}
+
+// GolangCI-lint related diagnostic
+func (v *Violation) Issue(pass *analysis.Pass) GolangIssue {
+	issue := GolangIssue{
+		Start:   pass.Fset.Position(v.callExpr.Pos()),
+		End:     pass.Fset.Position(v.callExpr.End()),
+		Message: v.Message(),
+	}
+
+	// original expression (useful for debug & requied for replace)
+	var buf bytes.Buffer
+	printer.Fprint(&buf, pass.Fset, v.callExpr)
+	issue.Original = buf.String()
+
+	noNl := strings.IndexByte(issue.Original, '\n') < 0
+
+	if v.Type == Method && noNl {
+		fix := v.suggest(pass.Fset)
+		issue.InlineFix = string(fix)
+	}
+
+	if v.AltPackage == "" {
+		v.AltPackage = v.Package
+	}
+
+	// Hooray! we don't need to change package and redo imports.
+	if v.Type == Function && v.AltPackage == v.Package && noNl {
+		fix := v.suggest(pass.Fset)
+		issue.InlineFix = string(fix)
+	}
+
+	return issue
 }
