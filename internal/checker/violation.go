@@ -7,6 +7,7 @@ import (
 	"go/printer"
 	"go/token"
 	"path"
+	"strings"
 
 	"golang.org/x/tools/go/analysis"
 )
@@ -100,17 +101,19 @@ func (v *Violation) suggest(fSet *token.FileSet) []byte {
 	return buf.Bytes()
 }
 
-func (v *Violation) Issue(fSet *token.FileSet) analysis.Diagnostic {
+func (v *Violation) Diagnostic(fSet *token.FileSet) analysis.Diagnostic {
 	diagnostic := analysis.Diagnostic{
 		Pos:     v.callExpr.Pos(),
 		End:     v.callExpr.Pos(),
 		Message: v.Message(),
 	}
 
-	// fmt.Println(string(v.suggest(fSet)))
+	var buf bytes.Buffer
+	printer.Fprint(&buf, fSet, v.callExpr)
+	noNl := bytes.IndexByte(buf.Bytes(), '\n') < 0
 
 	// Struct based fix.
-	if v.Type == Method {
+	if v.Type == Method && noNl {
 		diagnostic.SuggestedFixes = []analysis.SuggestedFix{{
 			Message: "Fix Issue With",
 			TextEdits: []analysis.TextEdit{{
@@ -119,8 +122,12 @@ func (v *Violation) Issue(fSet *token.FileSet) analysis.Diagnostic {
 		}}
 	}
 
+	if v.AltPackage == "" {
+		v.AltPackage = v.Package
+	}
+
 	// Hooray! we dont need to change package and redo imports.
-	if v.Type == Function && len(v.AltPackage) == 0 {
+	if v.Type == Function && v.AltPackage == v.Package && noNl {
 		diagnostic.SuggestedFixes = []analysis.SuggestedFix{{
 			Message: "Fix Issue With",
 			TextEdits: []analysis.TextEdit{{
@@ -132,4 +139,45 @@ func (v *Violation) Issue(fSet *token.FileSet) analysis.Diagnostic {
 	// do not change
 
 	return diagnostic
+}
+
+type GolangIssue struct {
+	Start     token.Position
+	End       token.Position
+	Message   string
+	InlineFix string
+	Original  string
+}
+
+// GolangCI-lint related diagnostic
+func (v *Violation) Issue(pass *analysis.Pass) GolangIssue {
+	issue := GolangIssue{
+		Start:   pass.Fset.Position(v.callExpr.Pos()),
+		End:     pass.Fset.Position(v.callExpr.End()),
+		Message: v.Message(),
+	}
+
+	// original expression (useful for debug & requied for replace)
+	var buf bytes.Buffer
+	printer.Fprint(&buf, pass.Fset, v.callExpr)
+	issue.Original = buf.String()
+
+	noNl := strings.IndexByte(issue.Original, '\n') < 0
+
+	if v.Type == Method && noNl {
+		fix := v.suggest(pass.Fset)
+		issue.InlineFix = string(fix)
+	}
+
+	if v.AltPackage == "" {
+		v.AltPackage = v.Package
+	}
+
+	// Hooray! we don't need to change package and redo imports.
+	if v.Type == Function && v.AltPackage == v.Package && noNl {
+		fix := v.suggest(pass.Fset)
+		issue.InlineFix = string(fix)
+	}
+
+	return issue
 }

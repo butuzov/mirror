@@ -4,7 +4,6 @@ import (
 	"flag"
 	"go/ast"
 	"strings"
-	"sync"
 
 	"github.com/butuzov/mirror/internal/checker"
 
@@ -13,22 +12,13 @@ import (
 	"golang.org/x/tools/go/ast/inspector"
 )
 
-type analyzer struct {
-	withTests bool
-	withDebug bool
-
-	once sync.Once
-}
-
 func NewAnalyzer() *analysis.Analyzer {
 	flags := flags()
-
-	a := analyzer{}
 
 	return &analysis.Analyzer{
 		Name: "mirror",
 		Doc:  "reports wrong mirror patterns of bytes/strings usage",
-		Run:  a.run,
+		Run:  run,
 		Requires: []*analysis.Analyzer{
 			inspect.Analyzer,
 		},
@@ -36,7 +26,18 @@ func NewAnalyzer() *analysis.Analyzer {
 	}
 }
 
-func (a *analyzer) run(pass *analysis.Pass) (interface{}, error) {
+func run(pass *analysis.Pass) (interface{}, error) {
+	withTests := pass.Analyzer.Flags.Lookup("with-tests").Value.String() == "true"
+	// --- Reporting violations via issues ---------------------------------------
+	for _, violation := range Run(pass, withTests) {
+		pass.Report(violation.Diagnostic(pass.Fset))
+	}
+
+	return nil, nil
+}
+
+func Run(pass *analysis.Pass, withTests bool) []*checker.Violation {
+	violations := []*checker.Violation{}
 	// --- Setup -----------------------------------------------------------------
 
 	check := checker.New(
@@ -51,10 +52,6 @@ func (a *analyzer) run(pass *analysis.Pass) (interface{}, error) {
 	check.Type = checker.WrapType(pass.TypesInfo)
 	check.Print = checker.WrapPrint(pass.Fset)
 
-	violations := []*checker.Violation{}
-
-	a.once.Do(a.setup(pass.Analyzer.Flags)) // loading flags info
-
 	ins, _ := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 	imports := checker.Load(pass.Fset, ins)
 
@@ -63,7 +60,7 @@ func (a *analyzer) run(pass *analysis.Pass) (interface{}, error) {
 		callExpr := n.(*ast.CallExpr)
 		fileName := pass.Fset.Position(callExpr.Pos()).Filename
 
-		if !a.withTests && strings.HasSuffix(fileName, "_test.go") {
+		if !withTests && strings.HasSuffix(fileName, "_test.go") {
 			return
 		}
 
@@ -124,19 +121,7 @@ func (a *analyzer) run(pass *analysis.Pass) (interface{}, error) {
 		}
 	})
 
-	// --- Reporting violations via issues ---------------------------------------
-	for _, violation := range violations {
-		pass.Report(violation.Issue(pass.Fset))
-	}
-
-	return nil, nil
-}
-
-func (a *analyzer) setup(f flag.FlagSet) func() {
-	return func() {
-		a.withTests = f.Lookup("with-tests").Value.String() == "true"
-		a.withDebug = f.Lookup("with-debug").Value.String() == "true"
-	}
+	return violations
 }
 
 func flags() flag.FlagSet {
