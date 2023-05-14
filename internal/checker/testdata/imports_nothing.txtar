@@ -1,0 +1,5 @@
+foobar
+-- a.go --
+package testdata
+
+func M() {}

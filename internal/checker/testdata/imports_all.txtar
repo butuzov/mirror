@@ -1,0 +1,55 @@
+foobar
+-- a.go --
+package testdata
+
+
+import (
+    foo1 "strings"
+    foo2 "strings"
+    foo3 "strings"
+    foo4 "strings"
+    foo5 "strings"
+    foo6 "strings"
+    foo7 "strings"
+    foo8 "strings"
+    foo9 "strings"
+    foo10 "strings"
+    foo11 "strings"
+    foo12 "strings"
+    foo13 "strings"
+    foo14 "strings"
+    foo15 "strings"
+    foo16 "strings"
+    foo17 "strings"
+    foo18 "strings"
+    foo19 "strings"
+    foo20 "strings"
+    . "strings"
+    "strings"
+)
+
+func M() {
+    foo1.EqualFold("string", "STRING")
+    foo2.EqualFold("string", "STRING")
+    foo3.EqualFold("string", "STRING")
+    foo4.EqualFold("string", "STRING")
+    foo5.EqualFold("string", "STRING")
+    foo6.EqualFold("string", "STRING")
+    foo7.EqualFold("string", "STRING")
+    foo8.EqualFold("string", "STRING")
+    foo9.EqualFold("string", "STRING")
+    foo10.EqualFold("string", "STRING")
+    foo11.EqualFold("string", "STRING")
+    foo12.EqualFold("string", "STRING")
+    foo13.EqualFold("string", "STRING")
+    foo14.EqualFold("string", "STRING")
+    foo15.EqualFold("string", "STRING")
+    foo16.EqualFold("string", "STRING")
+    foo17.EqualFold("string", "STRING")
+    foo18.EqualFold("string", "STRING")
+    foo19.EqualFold("string", "STRING")
+    foo20.EqualFold("string", "STRING")
+
+    EqualFold("string", "STRING")
+    strings.EqualFold("string", "STRING")
+}
