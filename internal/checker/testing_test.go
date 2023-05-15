@@ -8,8 +8,15 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/tools/txtar"
 )
+
+func ParseExprFrom(t *testing.T, fset *token.FileSet, src any) ast.Expr {
+	astExpr, err := parser.ParseExprFrom(fset, "a.go", src, parser.AllErrors)
+	assert.NoError(t, err)
+	return astExpr
+}
 
 func Txtar(t *testing.T, fset *token.FileSet, txtarPath string) (files []*ast.File, err error) {
 	t.Helper()

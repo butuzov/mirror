@@ -72,7 +72,7 @@ func TestImports(t *testing.T) {
 			ar, err := Txtar(t, fset, test.txtarPath)
 
 			assert.Nil(t, err)
-			assert.Len(t, len(ar), 1)
+			assert.Len(t, ar, 1)
 
 			ins := inspector.New(ar)
 			testImports := Load(fset, ins)
