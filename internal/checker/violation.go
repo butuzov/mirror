@@ -149,23 +149,24 @@ type GolangIssue struct {
 	Original  string
 }
 
-// GolangCI-lint related diagnostic
-func (v *Violation) Issue(pass *analysis.Pass) GolangIssue {
+// Issue inteanded to be used only with golangci-lint, bu you can use use it
+// alongside Diagnostic if you wish.
+func (v *Violation) Issue(fSet *token.FileSet) GolangIssue {
 	issue := GolangIssue{
-		Start:   pass.Fset.Position(v.callExpr.Pos()),
-		End:     pass.Fset.Position(v.callExpr.End()),
+		Start:   fSet.Position(v.callExpr.Pos()),
+		End:     fSet.Position(v.callExpr.End()),
 		Message: v.Message(),
 	}
 
 	// original expression (useful for debug & requied for replace)
 	var buf bytes.Buffer
-	printer.Fprint(&buf, pass.Fset, v.callExpr)
+	printer.Fprint(&buf, fSet, v.callExpr)
 	issue.Original = buf.String()
 
 	noNl := strings.IndexByte(issue.Original, '\n') < 0
 
 	if v.Type == Method && noNl {
-		fix := v.suggest(pass.Fset)
+		fix := v.suggest(fSet)
 		issue.InlineFix = string(fix)
 	}
 
@@ -175,7 +176,7 @@ func (v *Violation) Issue(pass *analysis.Pass) GolangIssue {
 
 	// Hooray! we don't need to change package and redo imports.
 	if v.Type == Function && v.AltPackage == v.Package && noNl {
-		fix := v.suggest(pass.Fset)
+		fix := v.suggest(fSet)
 		issue.InlineFix = string(fix)
 	}
 

@@ -1,0 +1,12 @@
+foobar
+-- a.go --
+package testdata
+
+
+import (
+    foo "strings"
+)
+
+func M() {
+    foo.EqualFold("string", "STRING")
+}

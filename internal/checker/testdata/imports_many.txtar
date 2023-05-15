@@ -1,0 +1,22 @@
+foobar
+-- a.go --
+package testdata
+
+
+import (
+    foo1 "strings"
+    foo2 "strings"
+    foo3 "strings"
+    foo4 "strings"
+    . "strings"
+    "strings"
+)
+
+func M() {
+    foo1.EqualFold("string", "STRING")
+    foo2.EqualFold("string", "STRING")
+    foo3.EqualFold("string", "STRING")
+    foo4.EqualFold("string", "STRING")
+    EqualFold("string", "STRING")
+    strings.EqualFold("string", "STRING")
+}

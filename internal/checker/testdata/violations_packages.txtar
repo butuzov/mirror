@@ -1,0 +1,11 @@
+foobar
+-- a.go --
+package testdata
+
+
+import (
+    "unicode/utf8"
+)
+
+// nothing as fix expected
+var foo = utf8.ValidString(string("foo"))

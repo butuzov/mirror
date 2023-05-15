@@ -1,0 +1,12 @@
+foobar
+-- a.go --
+package testdata
+
+
+import (
+    "unicode/utf8"
+)
+
+// we are only trying to match selector by description
+// and we specially set
+var foo = utf8.ValidString(string("foo"))
