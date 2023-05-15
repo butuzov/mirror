@@ -4,7 +4,6 @@ import (
 	"go/token"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"golang.org/x/tools/go/ast/inspector"
 )
 
@@ -70,25 +69,38 @@ func TestImports(t *testing.T) {
 
 			fset := token.NewFileSet()
 			ar, err := Txtar(t, fset, test.txtarPath)
+			if err != nil {
+				t.Errorf("nil err expected - got %s", err)
+			}
 
-			assert.Nil(t, err)
-			assert.Len(t, ar, 1)
+			if len(ar) != 1 {
+				t.Errorf("Files in txtar: got(%d) vs want(%d)", len(ar), 1)
+			}
 
 			ins := inspector.New(ar)
 			testImports := Load(fset, ins)
 
 			// assert
-			assert.Len(t, testImports["a.go"], test.importsLen)
+			if len(testImports["a.go"]) != test.importsLen {
+				t.Errorf("Imports len not match: got(%d) vs want(%d)", len(testImports["a.go"]), test.importsLen)
+			}
 
 			for k, v := range test.hasImports {
 				str, ok := testImports.Lookup("a.go", k)
-				assert.True(t, ok, "Import `%s` not found", k)
-				assert.Equal(t, v, str, "Wrong package found want(%s) vs got(%s)", v, str)
+				if !ok {
+					t.Errorf("Import `%s` not found", k)
+				}
+
+				if v != str {
+					t.Errorf("Wrong package found want(%s) vs got(%s)", v, str)
+				}
 			}
 
 			// test if lookup produce fail
 			str, ok := testImports.Lookup("a.go", "foobar")
-			assert.False(t, ok, "found somethig enexpected %s", str)
+			if ok {
+				t.Errorf("found enexpected package %s", str)
+			}
 		})
 	}
 }

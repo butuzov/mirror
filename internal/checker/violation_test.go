@@ -7,7 +7,6 @@ import (
 	"go/types"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"golang.org/x/tools/go/ast/inspector"
 )
 
@@ -103,8 +102,14 @@ func TestViolation(t *testing.T) {
 			}
 
 			v2 := test.Violation.With(base, expr, args)
-			assert.Equal(t, test.ExpectedSuggest, string(v2.suggest(fset)))
-			assert.Equal(t, test.Message, v2.Message())
+			fix := string(v2.suggest(fset))
+			if test.ExpectedSuggest != fix {
+				t.Errorf("Fix not match: want(%s) vs got(%s)", test.ExpectedSuggest, fix)
+			}
+			message := v2.Message()
+			if test.Message != message {
+				t.Errorf("Message not match: want(%s) vs got(%s)", test.Message, message)
+			}
 		})
 	}
 }
@@ -171,7 +176,9 @@ func TestComplex(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			fset := token.NewFileSet()
 			ar, err := Txtar(t, fset, test.TxtAr)
-			assert.Nil(t, err)
+			if err != nil {
+				t.Errorf("nil err expected - got %s", err)
+			}
 
 			var (
 				ins  = inspector.New(ar)
@@ -188,7 +195,9 @@ func TestComplex(t *testing.T) {
 			// ------ Setup ----------------------------------------------------------
 
 			_, err = conf.Check("source", fset, ar, &info)
-			assert.NoError(t, err)
+			if err != nil {
+				t.Errorf("nil err expected - got %s", err)
+			}
 
 			check := New([]Violation{test.Violation})
 			check.Type = WrapType(&info)
@@ -206,25 +215,37 @@ func TestComplex(t *testing.T) {
 				callExpr := n.(*ast.CallExpr)
 				expr := callExpr.Fun.(*ast.SelectorExpr)
 				x, ok := expr.X.(*ast.Ident)
-				assert.True(t, ok)
+				if !ok {
+					t.Errorf("Expected ast.Indent")
+				}
 
 				name := expr.Sel.Name
 				// skipping import checks with correct import path
 				v := check.Match(test.ImportPath, name)
-				assert.NotNil(t, v)
-				assert.Equal(t, *v, test.Violation)
+				if v == nil {
+					t.Error("nil violation not expected")
+				}
 
 				args, found := check.Handle(v, callExpr)
-				assert.True(t, found, "no string to string conversions found")
+				if !found {
+					t.Errorf("no string to string conversions found")
+				}
 				v2 := v.With(check.Print(x), callExpr, args)
 
 				gciIssue := v2.Issue(fset)
 
-				assert.Equal(t, test.ExpectedFix, gciIssue.InlineFix, "fix not match")
-				assert.Equal(t, test.ExpectedMessage, gciIssue.Message, "message not match")
+				if test.ExpectedFix != gciIssue.InlineFix {
+					t.Errorf("Fix not match: want(%s) vs got(%s)", test.ExpectedFix, gciIssue.InlineFix)
+				}
+
+				if test.ExpectedMessage != gciIssue.Message {
+					t.Errorf("Message not match: want(%s) vs got(%s)", test.ExpectedMessage, gciIssue.Message)
+				}
 			})
 
-			assert.True(t, happend, "Test Not Happend")
+			if !happend {
+				t.Errorf("Test Not Happend")
+			}
 		})
 	}
 }
