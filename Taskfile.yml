@@ -10,7 +10,7 @@ tasks:
     - make build
     - make build-race
     - task: lints
-    - make test-generate
+    # - make test-generate
     - task: tests
     - cmd: go run ./cmd/mirror/ --with-tests --with-debug ./demo
       ignore_error: true

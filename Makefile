@@ -2,7 +2,7 @@
 export PATH   := $(PWD)/bin:$(PATH)                    # ./bin to $PATH
 export SHELL  := bash                                  # Default Shell
 
-GOPKGS := $(shell go list ./... | grep -vE "(cmd|examples|plugin|testdata|backup)" | tr -s '\n' ',' | sed 's/.\{1\}$$//' )
+GOPKGS := $(shell go list ./... | grep -vE "(cmd|sandbox|testdata)" | tr -s '\n' ',' | sed 's/.\{1\}$$//' )
 
 
 build:
@@ -33,7 +33,7 @@ test-generate:
 	go run ./cmd/internal/generate-tests/ "$(PWD)/testdata"
 
 lints:
-	golangci-lint run --no-config ./... -D deadcode --skip-dirs "^(cmd|plugin|examples|testdata)"
+	golangci-lint run --no-config ./... -D deadcode --skip-dirs "^(cmd|sandbox|testdata)"
 
 
 cover:
