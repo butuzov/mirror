@@ -4,7 +4,7 @@ bin/*
 dist/*
 tmp/*
 out*
-new_funcs*
+sandbox*
 demo*
 .task*
 .ipynb*

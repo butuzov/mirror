@@ -77,7 +77,13 @@ func (c *Checker) Handle(v *Violation, ce *ast.CallExpr) (map[int]ast.Expr, bool
 		}
 
 		// wrong argument type
-		if v.Targets == c.Type(call.Args[0]) {
+		typeOf := c.Type(call.Args[0])
+		if typeOf != Strings && typeOf != Bytes {
+			// rune or byte in string argument
+			continue
+		} else if v.Targets == typeOf {
+			// same type like string("string") <- this is bad, but other linters
+			// (like unconvert) can handle it
 			continue
 		}
 
@@ -91,7 +97,6 @@ func (c *Checker) callConverts(ce *ast.CallExpr) bool {
 	switch ce.Fun.(type) {
 	case *ast.ArrayType, *ast.Ident:
 		res := c.Type(ce.Fun)
-
 		return res == "[]byte" || res == "string"
 	}
 
