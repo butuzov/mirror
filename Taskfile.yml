@@ -12,7 +12,7 @@ tasks:
     - task: lints
     # - make test-generate
     - task: tests
-    - cmd: go run ./cmd/mirror/ --with-tests --with-debug ./demo
+    - cmd: go run ./cmd/mirror/ --with-tests --with-debug ./sandbox
       ignore_error: true
 
   testcase: go test -v -failfast -count=1 -run "TestAll/{{ .Case }}" ./...
