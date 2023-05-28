@@ -21,14 +21,18 @@ const (
 )
 
 const (
-	Strings string = "string"
-	Bytes   string = "[]byte"
+	Strings     string = "string"
+	Bytes       string = "[]byte"
+	Byte        string = "byte"
+	Rune        string = "rune"
+	UntypedRune string = "untyped rune"
 )
 
 // Violation describs what message we going to give to a particular code violation
 type Violation struct {
-	Type ViolationType //
-	Args []int         // Indexes of the arguments needs to be checked
+	Type     ViolationType //
+	Args     []int         // Indexes of the arguments needs to be checked
+	ArgsType string
 
 	Targets    string
 	Package    string
@@ -59,6 +63,18 @@ func (v *Violation) With(base []byte, e *ast.CallExpr, args map[int]ast.Expr) *V
 	v.arguments = args
 
 	return v
+}
+
+func (v *Violation) getArgType() string {
+	if v.ArgsType != "" {
+		return v.ArgsType
+	}
+
+	if v.Targets == Strings {
+		return Bytes
+	}
+
+	return Strings
 }
 
 func (v *Violation) Message() string {

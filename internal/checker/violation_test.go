@@ -249,3 +249,51 @@ func TestComplex(t *testing.T) {
 		})
 	}
 }
+
+func TestArgType(t *testing.T) {
+	tests := []struct {
+		Name      string
+		Violation Violation
+		Expected  string
+	}{
+		{
+			Name: "DefaultStrings",
+			Violation: Violation{
+				Targets: Bytes,
+			},
+			Expected: Strings,
+		},
+		{
+			Name: "DefaultBytes",
+			Violation: Violation{
+				Targets: Strings,
+			},
+			Expected: Bytes,
+		},
+		{
+			Name: "NonDefault_Runes",
+			Violation: Violation{
+				Targets:  Strings,
+				ArgsType: Rune,
+			},
+			Expected: Rune,
+		},
+		{
+			Name: "NonDefault_Byte",
+			Violation: Violation{
+				Targets:  Strings,
+				ArgsType: Byte,
+			},
+			Expected: Byte,
+		},
+	}
+
+	for i := range tests {
+		test := tests[i]
+		t.Run(test.Name, func(t *testing.T) {
+			if test.Violation.getArgType() != test.Expected {
+				t.Errorf("unexpected arg type: want(%s) vs got(%s)", test.Expected, test.Violation.getArgType())
+			}
+		})
+	}
+}

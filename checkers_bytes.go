@@ -302,5 +302,25 @@ var (
 				Returns:      2,
 			},
 		},
+		{ // (*bytes.Buffer).WriteString -> (*bytes.Buffer).WriteRune
+			Targets:   checker.Strings,
+			Type:      checker.Method,
+			Package:   "bytes",
+			Struct:    "Buffer",
+			Caller:    "WriteString",
+			Args:      []int{0},
+			ArgsType:  checker.Rune,
+			AltCaller: "WriteRune",
+		},
+		{ // (*bytes.Buffer).WriteString -> (*bytes.Buffer).WriteByte
+			Targets:   checker.Strings,
+			Type:      checker.Method,
+			Package:   "bytes",
+			Struct:    "Buffer",
+			Caller:    "WriteString",
+			Args:      []int{0},
+			ArgsType:  checker.Byte,
+			AltCaller: "WriteByte",
+		},
 	}
 )
