@@ -198,3 +198,11 @@ func (v *Violation) Issue(fSet *token.FileSet) GolangIssue {
 
 	return issue
 }
+
+// ofType normalize input types (mostly typed and untyped runes).
+func normalType(s string) string {
+	if s == UntypedRune {
+		return Rune
+	}
+	return s
+}

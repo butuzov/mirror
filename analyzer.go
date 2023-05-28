@@ -100,11 +100,15 @@ func Run(pass *analysis.Pass, withTests bool) []*checker.Violation {
 			}
 
 			pkgStruct, name := cleanAsterisk(tv.Type.String()), expr.Sel.Name
-			if v := check.Match(pkgStruct, name); v != nil {
+			for _, v := range check.Matches(pkgStruct, name) {
+				if v == nil {
+					continue
+				}
+
 				if args, found := check.Handle(v, callExpr); found {
 					violations = append(violations, v.With(check.Print(expr.X), callExpr, args))
+					return
 				}
-				return
 			}
 
 		case *ast.Ident:

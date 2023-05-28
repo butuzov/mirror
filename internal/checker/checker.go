@@ -32,7 +32,18 @@ func New(violations ...[]Violation) Checker {
 // Match will check the available violations we got from checks against
 // the `name` caller from package `pkgName`.
 func (c *Checker) Match(pkgName, name string) *Violation {
-	// Does it have struct?
+	for _, v := range c.Matches(pkgName, name) {
+		return v
+	}
+
+	return nil
+}
+
+// Matches do same thing as Match but return a slice of violations
+// as only things that require this are bytes.Buffer and strings.Builder
+// it only be used in matching methods in analyzer.
+func (c *Checker) Matches(pkgName, name string) []*Violation {
+	var matches []*Violation
 	checkStruct := strings.Contains(pkgName, ".")
 
 	for _, idx := range c.Packages[pkgName] {
@@ -43,12 +54,11 @@ func (c *Checker) Match(pkgName, name string) *Violation {
 
 			// copy violation
 			v := c.Violations[idx]
-
-			return &v
+			matches = append(matches, &v)
 		}
 	}
 
-	return nil
+	return matches
 }
 
 func (c *Checker) Handle(v *Violation, ce *ast.CallExpr) (map[int]ast.Expr, bool) {
@@ -77,13 +87,7 @@ func (c *Checker) Handle(v *Violation, ce *ast.CallExpr) (map[int]ast.Expr, bool
 		}
 
 		// wrong argument type
-		typeOf := c.Type(call.Args[0])
-		if typeOf != Strings && typeOf != Bytes {
-			// rune or byte in string argument
-			continue
-		} else if v.Targets == typeOf {
-			// same type like string("string") <- this is bad, but other linters
-			// (like unconvert) can handle it
+		if normalType(c.Type(call.Args[0])) != v.getArgType() {
 			continue
 		}
 
