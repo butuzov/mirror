@@ -285,15 +285,15 @@ var (
 			ArgsType:  checker.Rune,
 			AltCaller: "WriteRune",
 		},
-		{ // (*strings.Builder).WriteString -> (*strings.Builder).WriteByte
-			Targets:   checker.Strings,
-			Type:      checker.Method,
-			Package:   "strings",
-			Struct:    "Builder",
-			Caller:    "WriteString",
-			Args:      []int{0},
-			ArgsType:  checker.Byte,
-			AltCaller: "WriteByte", // byte
-		},
+		// { // (*strings.Builder).WriteString -> (*strings.Builder).WriteByte
+		// 	Targets:   checker.Strings,
+		// 	Type:      checker.Method,
+		// 	Package:   "strings",
+		// 	Struct:    "Builder",
+		// 	Caller:    "WriteString",
+		// 	Args:      []int{0},
+		// 	ArgsType:  checker.Byte,
+		// 	AltCaller: "WriteByte", // byte
+		// },
 	}
 )

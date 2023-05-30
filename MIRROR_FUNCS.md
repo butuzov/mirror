@@ -1,13 +1,15 @@
 <table><tr>
 <td><code>func (b *bufio.Writer) WriteString(s string) (int, error)</code></td>
-<td><code>func (b *bufio.Writer) Write(p []byte) (int, error)</code></td>
+<td>
+  <code>func (b *bufio.Writer) Write(p []byte) (int, error)</code>
+  <code>func (b *bufio.Writer) WriteRune(r rune) (int, error)</code>
+</td>
 </tr>
 <tr>
 <td><code>func (b *bytes.Buffer) WriteString(s string) (int, error)</code></td>
 <td>
   <code>func (b *bytes.Buffer) Write(p []byte) (int, error)</code>
   <code>func (b *bytes.Buffer) WriteRune(r rune) (int, error)</code>
-  <code>func (b *bytes.Buffer) WriteByte(b byte) error</code>
  </td>
 </tr>
 <tr>
@@ -123,7 +125,6 @@
 <td>
   <code>func (b *strings.Builder) Write(p []byte) (int, error)</code>
   <code>func (b *strings.Builder) WriteRune(r rune) (int, error)</code>
-  <code>func (b *strings.Builder) WriteByte(b byte) error</code>
  </td>
 </tr>
 <tr>
@@ -146,4 +147,4 @@
 <td><code>func utf8.DecodeRuneInString(s string) (une, int)</code></td>
 <td><code>func utf8.DecodeRune(p []byte) (rune, int)</code></td>
 </tr>
-</table> 
+</table>
