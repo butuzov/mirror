@@ -12,6 +12,7 @@ func foobar_byte() {
 
 	fmt.Printf("%T\n", b)
 
-	strBuilder.WriteString(string(b)) // want `avoid allocations with \(\*strings\.Builder\)\.WriteByte`
+	// TODO: WriteByte can be added but only if return of this call doesn't checked.
+	strBuilder.WriteString(string(b))
 	fmt.Println(strBuilder.String())
 }

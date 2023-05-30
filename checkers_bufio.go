@@ -33,4 +33,24 @@ var BufioMethods = []checker.Violation{
 			Returns:      2,
 		},
 	},
+	{ // (*bufio.Writer).WriteString -> (*bufio.Writer).WriteRune
+		Targets:   checker.Strings,
+		Type:      checker.Method,
+		Package:   "bufio",
+		Struct:    "Writer",
+		Caller:    "WriteString",
+		Args:      []int{0},
+		ArgsType:  checker.Rune,
+		AltCaller: "WriteRune",
+	},
+	// { // (*bufio.Writer).WriteString -> (*bufio.Writer).WriteByte
+	// 	Targets:   checker.Strings,
+	// 	Type:      checker.Method,
+	// 	Package:   "strings",
+	// 	Struct:    "Builder",
+	// 	Caller:    "WriteString",
+	// 	Args:      []int{0},
+	// 	ArgsType:  checker.Byte,
+	// 	AltCaller: "WriteByte", // byte
+	// },
 }
