@@ -761,6 +761,36 @@ func main_strings() {
 	}
 
 	{
+		
+		_ = strings.NewReader(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.NewReader`
+	}
+
+	{
+		
+		_ = strings.NewReader("foobar") 
+	}
+
+	{
+		
+		_ = NewReader(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.NewReader`
+	}
+
+	{
+		
+		_ = NewReader("foobar") 
+	}
+
+	{
+		
+		_ = pkg.NewReader(string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with bytes\.NewReader`
+	}
+
+	{
+		
+		_ = pkg.NewReader("foobar") 
+	}
+
+	{
 		builder := strings.Builder{}
 		_,_ = builder.Write([]byte("foobar")) // want `avoid allocations with \(\*strings\.Builder\)\.WriteString`
 	}

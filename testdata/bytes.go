@@ -821,6 +821,36 @@ func main_bytes() {
 	}
 
 	{
+		
+		_ = bytes.NewReader([]byte("foobar")) // want `avoid allocations with strings\.NewReader`
+	}
+
+	{
+		
+		_ = bytes.NewReader([]byte{'f','o','o','b','a','r'}) 
+	}
+
+	{
+		
+		_ = NewReader([]byte("foobar")) // want `avoid allocations with strings\.NewReader`
+	}
+
+	{
+		
+		_ = NewReader([]byte{'f','o','o','b','a','r'}) 
+	}
+
+	{
+		
+		_ = pkg.NewReader([]byte("foobar")) // want `avoid allocations with strings\.NewReader`
+	}
+
+	{
+		
+		_ = pkg.NewReader([]byte{'f','o','o','b','a','r'}) 
+	}
+
+	{
 		bb := bytes.Buffer{}
 		_,_ = bb.Write([]byte("foobar")) // want `avoid allocations with \(\*bytes\.Buffer\)\.WriteString`
 	}

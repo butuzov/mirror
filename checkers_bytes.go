@@ -30,6 +30,20 @@ var (
 				Returns: 1,
 			},
 		},
+		{ // bytes.NewReader
+			Targets:    checker.Bytes,
+			Type:       checker.Function,
+			Package:    "bytes",
+			Caller:     "NewReader",
+			Args:       []int{0},
+			AltPackage: "strings",
+			AltCaller:  "NewReader",
+
+			Generate: &checker.Generate{
+				Pattern: `NewReader($0)`,
+				Returns: 1,
+			},
+		},
 		{ // bytes.Compare:
 			Targets:    checker.Bytes,
 			Type:       checker.Function,
