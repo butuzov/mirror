@@ -242,6 +242,20 @@ var (
 				Returns: 1,
 			},
 		},
+		{ // strings.NewReader
+			Targets:    checker.Strings,
+			Type:       checker.Function,
+			Package:    "strings",
+			Caller:     "NewReader",
+			Args:       []int{0},
+			AltPackage: "bytes",
+			AltCaller:  "NewReader",
+
+			Generate: &checker.Generate{
+				Pattern: `NewReader($0)`,
+				Returns: 1,
+			},
+		},
 	}
 
 	StringsBuilderMethods = []checker.Violation{

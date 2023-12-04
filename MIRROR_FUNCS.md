@@ -85,6 +85,10 @@
 <td><code>func bytes.NewBuffer(buf []byte *bytes.Buffer</code></td>
 </tr>
 <tr>
+<td><code>func strings.NewReader(s string) *Reader</code></td>
+<td><code>func bytes.NewReader(b []byte) *Reader</code></td>
+</tr>
+<tr>
 <td><code>func (h *hash/maphash.Hash) WriteString(s string) (int, error)</code></td>
 <td><code>func (h *hash/maphash.Hash) Write(b []byte) (int, error)</code></td>
 </tr>
