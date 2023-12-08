@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"embed"
+	"fmt"
 	"log"
 	"os"
 	"path"
@@ -44,7 +45,8 @@ func main() {
 		tests = append(tests, generateTests("strings", mirror.StringFunctions)...)
 		tests = append(tests, generateTests("strings", mirror.StringsBuilderMethods)...)
 
-		GenerateTestFile(filepath.Join(testdata, "strings.go"), "strings", tests)
+		err := GenerateTestFile(filepath.Join(testdata, "strings.go"), "strings", tests)
+		fmt.Printf("strings.go: err is %v\n", err)
 	}
 
 	{ // bytes
@@ -53,14 +55,16 @@ func main() {
 		tests = append(tests, generateTests("bytes", mirror.BytesFunctions)...)
 		tests = append(tests, generateTests("bytes", mirror.BytesBufferMethods)...)
 
-		GenerateTestFile(filepath.Join(testdata, "bytes.go"), "bytes", tests)
+		err := GenerateTestFile(filepath.Join(testdata, "bytes.go"), "bytes", tests)
+		fmt.Printf("bytes.go: err is %v\n", err)
 	}
 	{ // hash/maphash
 
 		tests := []string{}
 		tests = append(tests, generateTests("maphash", mirror.MaphashMethods)...)
 
-		GenerateTestFile(filepath.Join(testdata, "maphash.go"), "hash/maphash", tests)
+		err := GenerateTestFile(filepath.Join(testdata, "maphash.go"), "hash/maphash", tests)
+		fmt.Printf("maphash.go: err is %v\n", err)
 	}
 
 	{ // unicode/utf8
@@ -68,7 +72,8 @@ func main() {
 		tests := []string{}
 		tests = append(tests, generateTests("utf8", mirror.UTF8Functions)...)
 
-		GenerateTestFile(filepath.Join(testdata, "utf8.go"), "unicode/utf8", tests)
+		err := GenerateTestFile(filepath.Join(testdata, "utf8.go"), "unicode/utf8", tests)
+		fmt.Printf("utf8.go: err is %v\n", err)
 	}
 
 	{ // bufio
@@ -76,7 +81,8 @@ func main() {
 		tests := []string{}
 		tests = append(tests, generateTests("bufio", mirror.BufioMethods)...)
 
-		GenerateTestFile(filepath.Join(testdata, "bufio.go"), "bufio", tests)
+		err := GenerateTestFile(filepath.Join(testdata, "bufio.go"), "bufio", tests)
+		fmt.Printf("bufio.go: err is %v\n", err)
 	}
 
 	{ // bufio
@@ -84,16 +90,14 @@ func main() {
 		tests := []string{}
 		tests = append(tests, generateTests("os", mirror.OsFileMethods)...)
 
-		GenerateTestFile(filepath.Join(testdata, "os.go"), "os", tests)
+		err := GenerateTestFile(filepath.Join(testdata, "os.go"), "os", tests)
+		fmt.Printf("os.go: err is %v\n", err)
 	}
 }
 
 func testdataExistenceCheck(path string) bool {
 	_, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return true
+	return !os.IsNotExist(err)
 }
 
 func GenerateTestFile(file string, pkgName string, Tests []string) error {
