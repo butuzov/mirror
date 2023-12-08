@@ -522,62 +522,62 @@ func main_strings() {
 
 	{
 		
-		_ = strings.IndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `avoid allocations with bytes\.IndexByte`
+		_ = strings.IndexByte(string([]byte{'f','o','o','b','a','r'}), 'f') // want `avoid allocations with bytes\.IndexByte`
 	}
 
 	{
 		
-		_ = strings.IndexByte("foobar", byte('f')) 
+		_ = strings.IndexByte("foobar", 'f') 
 	}
 
 	{
 		
-		_ = IndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `avoid allocations with bytes\.IndexByte`
+		_ = IndexByte(string([]byte{'f','o','o','b','a','r'}), 'f') // want `avoid allocations with bytes\.IndexByte`
 	}
 
 	{
 		
-		_ = IndexByte("foobar", byte('f')) 
+		_ = IndexByte("foobar", 'f') 
 	}
 
 	{
 		
-		_ = pkg.IndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `avoid allocations with bytes\.IndexByte`
+		_ = pkg.IndexByte(string([]byte{'f','o','o','b','a','r'}), 'f') // want `avoid allocations with bytes\.IndexByte`
 	}
 
 	{
 		
-		_ = pkg.IndexByte("foobar", byte('f')) 
+		_ = pkg.IndexByte("foobar", 'f') 
 	}
 
 	{
 		
-		_ = strings.IndexFunc(string([]byte{'f','o','o','b','a','r'}),func(r rune) bool { return true }) // want `avoid allocations with bytes\.IndexFunc`
+		_ = strings.IndexFunc(string([]byte{'f','o','o','b','a','r'}), func(r rune) bool { return true }) // want `avoid allocations with bytes\.IndexFunc`
 	}
 
 	{
 		
-		_ = strings.IndexFunc("foobar",func(r rune) bool { return true }) 
+		_ = strings.IndexFunc("foobar", func(r rune) bool { return true }) 
 	}
 
 	{
 		
-		_ = IndexFunc(string([]byte{'f','o','o','b','a','r'}),func(r rune) bool { return true }) // want `avoid allocations with bytes\.IndexFunc`
+		_ = IndexFunc(string([]byte{'f','o','o','b','a','r'}), func(r rune) bool { return true }) // want `avoid allocations with bytes\.IndexFunc`
 	}
 
 	{
 		
-		_ = IndexFunc("foobar",func(r rune) bool { return true }) 
+		_ = IndexFunc("foobar", func(r rune) bool { return true }) 
 	}
 
 	{
 		
-		_ = pkg.IndexFunc(string([]byte{'f','o','o','b','a','r'}),func(r rune) bool { return true }) // want `avoid allocations with bytes\.IndexFunc`
+		_ = pkg.IndexFunc(string([]byte{'f','o','o','b','a','r'}), func(r rune) bool { return true }) // want `avoid allocations with bytes\.IndexFunc`
 	}
 
 	{
 		
-		_ = pkg.IndexFunc("foobar",func(r rune) bool { return true }) 
+		_ = pkg.IndexFunc("foobar", func(r rune) bool { return true }) 
 	}
 
 	{
@@ -702,32 +702,32 @@ func main_strings() {
 
 	{
 		
-		_ = strings.LastIndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `avoid allocations with bytes\.LastIndexByte`
+		_ = strings.LastIndexByte(string([]byte{'f','o','o','b','a','r'}), 'f') // want `avoid allocations with bytes\.LastIndexByte`
 	}
 
 	{
 		
-		_ = strings.LastIndexByte("foobar", byte('f')) 
+		_ = strings.LastIndexByte("foobar", 'f') 
 	}
 
 	{
 		
-		_ = LastIndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `avoid allocations with bytes\.LastIndexByte`
+		_ = LastIndexByte(string([]byte{'f','o','o','b','a','r'}), 'f') // want `avoid allocations with bytes\.LastIndexByte`
 	}
 
 	{
 		
-		_ = LastIndexByte("foobar", byte('f')) 
+		_ = LastIndexByte("foobar", 'f') 
 	}
 
 	{
 		
-		_ = pkg.LastIndexByte(string([]byte{'f','o','o','b','a','r'}), byte('f')) // want `avoid allocations with bytes\.LastIndexByte`
+		_ = pkg.LastIndexByte(string([]byte{'f','o','o','b','a','r'}), 'f') // want `avoid allocations with bytes\.LastIndexByte`
 	}
 
 	{
 		
-		_ = pkg.LastIndexByte("foobar", byte('f')) 
+		_ = pkg.LastIndexByte("foobar", 'f') 
 	}
 
 	{

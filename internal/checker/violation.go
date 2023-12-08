@@ -52,9 +52,10 @@ type Violation struct {
 
 // Tests (generation) related struct.
 type Generate struct {
-	PreCondition string // Precondition we want to be generated
-	Pattern      string // Generate pattern (for the `want` message)
-	Returns      int    // Expected to return n elements
+	SkipGenerate bool
+	PreCondition string   // Precondition we want to be generated
+	Pattern      string   // Generate pattern (for the `want` message)
+	Returns      []string // ReturnTypes as slice
 }
 
 func (v *Violation) With(base []byte, e *ast.CallExpr, args map[int]ast.Expr) *Violation {

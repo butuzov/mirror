@@ -116,14 +116,6 @@ func all(n int) int {
 	return (1 << (n)) - 1
 }
 
-func makeFunc(pattern string, replaces []string) string {
-	for i := 0; i < len(replaces); i++ {
-		pattern = strings.Replace(pattern,
-			fmt.Sprintf("$%d", i), fmt.Sprintf("arg%d", i), 1)
-	}
-	return pattern
-}
-
 func makeFuncInline(pattern string, replaces []string) string {
 	for i := 0; i < len(replaces); i++ {
 
@@ -157,6 +149,10 @@ func generateTests(pkgName string, list []checker.Violation) []string {
 					wantStr = QuoteRegexp(test.Message())
 				}
 
+				if test.Generate.SkipGenerate {
+					continue
+				}
+
 				var buf bytes.Buffer
 
 				pkgInTest := pkg
@@ -175,7 +171,7 @@ func generateTests(pkgName string, list []checker.Violation) []string {
 
 				templates.ExecuteTemplate(&buf, "case.tmpl", TestCase{
 					Arguments: []string{},
-					Returns:   GenReturnelements(test.Generate.Returns),
+					Returns:   GenReturnelements(len(test.Generate.Returns)),
 					Package:   pkgInTest,
 					PreCond:   preCondition,
 					Func: makeFuncInline(test.Generate.Pattern,
