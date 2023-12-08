@@ -100,3 +100,15 @@ util/cert/cert.go:82:10: avoid allocations with (*regexp.Regexp).MatchString (mi
             linters:
               - mirror
       ```
+
+
+## Contributing
+
+```shell
+# Update Assets (testdata/(strings|bytes|os|utf8|maphash|regexp|bufio).go)
+(task|make) generated
+# Run Tests
+(task|make) tests
+# Lint Code
+(task|make) lints
+```
