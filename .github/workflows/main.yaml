@@ -18,6 +18,7 @@ jobs:
         go:
           - "1.19"
           - "1.20"
+          - "1.21"
     steps:
 
       - uses: actions/checkout@v4
@@ -40,11 +41,11 @@ jobs:
 
       - name: Install goveralls
         env: { GO111MODULE: "off" }
-        if: matrix.go == '1.20'
+        if: matrix.go == '1.21'
         run: go get github.com/mattn/goveralls
 
       - name: Coverage - Sending Report to Coveral
-        if: matrix.go == '1.20'
+        if: matrix.go == '1.21'
         env:
           COVERALLS_TOKEN: ${{ secrets.github_token }}
         run: goveralls -coverprofile=coverage.cov -service=github
@@ -59,5 +60,5 @@ jobs:
           version: latest
           skip-build-cache: true
           skip-pkg-cache: true
-          args: -D deadcode --skip-dirs "^(cmd|testdata)"
+          args: --skip-dirs "^(cmd|testdata)"
 
