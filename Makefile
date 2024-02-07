@@ -2,8 +2,6 @@
 export PATH   := $(PWD)/bin:$(PATH)                    # ./bin to $PATH
 export SHELL  := bash                                  # Default Shell
 
-GOPKGS := $(shell go list ./... | grep -vE "(cmd|testdata)" | tr -s '\n' ',' | sed 's/.\{1\}$$//' )
-
 define install_go_bin
 	@ which $(1) 2>&1 1>/dev/null || GOBIN=$(PWD)/bin go install $(2)
 endef
@@ -38,7 +36,7 @@ tests: ## Run Tests (Summary)
 		-parallel=2 \
 		-timeout=1m \
 		-covermode=atomic \
-		-coverpkg=$(GOPKGS) -coverprofile=coverage.cov ./...
+	    -coverprofile=coverage.cov ./...
 
 tests-summary: ## Run Tests, but shows summary
 tests-summary: bin/tparse
@@ -47,7 +45,7 @@ tests-summary: bin/tparse
 		-parallel=2 \
 		-timeout=1m \
 		-covermode=atomic \
-		-coverpkg=$(GOPKGS) -coverprofile=coverage.cov --json ./... | tparse -all
+		-coverprofile=coverage.cov --json ./... | tparse -all
 
 # Linter ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
