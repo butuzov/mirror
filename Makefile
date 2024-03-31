@@ -62,8 +62,7 @@ cover: ## Run Coverage
 
 test-release: bin/goreleaser
 	goreleaser release --help
-	goreleaser release -f .goreleaser.yaml \
-		--skip-validate --skip-publish --clean
+	goreleaser release --skip=publish --skip=validate --clean
 
 # Install  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -77,8 +76,8 @@ bin/golangci-lint: INSTALL_URL=github.com/golangci/golangci-lint@v1.55.2
 bin/golangci-lint:
 	$(call install_go_bin, golangci-lint, $(INSTALL_URL))
 
-bin/goreleaser: ## Installs golangci-lint@v1.17.2 (if not exists)
-bin/goreleaser: INSTALL_URL=github.com/goreleaser/goreleaser-lint@v1.17.2
+bin/goreleaser: ## Installs goreleaser@v1.24.0 (if not exists)
+bin/goreleaser: INSTALL_URL=github.com/goreleaser/goreleaser@v1.24.0
 bin/goreleaser:
 	$(call install_go_bin, goreleaser, $(INSTALL_URL))
 
