@@ -166,7 +166,7 @@ type GolangIssue struct {
 	Original  string
 }
 
-// Issue inteanded to be used only with golangci-lint, bu you can use use it
+// Issue intended to be used only within `golangci-lint`, bu you can use use it
 // alongside Diagnostic if you wish.
 func (v *Violation) Issue(fSet *token.FileSet) GolangIssue {
 	issue := GolangIssue{
@@ -175,7 +175,7 @@ func (v *Violation) Issue(fSet *token.FileSet) GolangIssue {
 		Message: v.Message(),
 	}
 
-	// original expression (useful for debug & requied for replace)
+	// original expression (useful for debug & required for replace)
 	var buf bytes.Buffer
 	printer.Fprint(&buf, fSet, v.callExpr)
 	issue.Original = buf.String()
