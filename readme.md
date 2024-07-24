@@ -93,13 +93,13 @@ util/cert/cert.go:82:10: avoid allocations with (*regexp.Regexp).MatchString (mi
 
   - flag `--tests` (e.g. `--tests=false`)
   - flag `--skip-files` (e.g. `--skip-files="_test.go"`)
-  - yaml confguration `run.skip-files`:
+  - yaml configuration `run.skip-files`:
     ```yaml
     run:
       skip-files:
         - '(.+)_test\.go'
     ```
-  - yaml confguration `issues.exclude-rules`:
+  - yaml configuration `issues.exclude-rules`:
     ```yaml
       issues:
         exclude-rules:

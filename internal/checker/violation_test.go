@@ -203,14 +203,14 @@ func TestComplex(t *testing.T) {
 			check.Type = WrapType(&info)
 			check.Print = WrapPrint(fset)
 
-			var happend bool
+			var happened bool
 
 			ins.Preorder([]ast.Node{(*ast.CallExpr)(nil)}, func(n ast.Node) {
 				// allow to check only first call
-				if happend {
+				if happened {
 					return
 				}
-				happend = true
+				happened = true
 				// ---- test --------------------------------------------------
 				callExpr := n.(*ast.CallExpr)
 				expr := callExpr.Fun.(*ast.SelectorExpr)
@@ -243,8 +243,8 @@ func TestComplex(t *testing.T) {
 				}
 			})
 
-			if !happend {
-				t.Errorf("Test Not Happend")
+			if !happened {
+				t.Errorf("Test Not Happened")
 			}
 		})
 	}
