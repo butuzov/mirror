@@ -15,5 +15,5 @@ func S1() {
 	}
 
 	contentBuf := bytes.NewBufferString("foo-bar\n")
-	contentBuf.WriteString(hex.EncodeToString(h.Sum(nil))) // false postitve
+	contentBuf.WriteString(hex.EncodeToString(h.Sum(nil))) // false positive
 }

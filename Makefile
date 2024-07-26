@@ -99,7 +99,7 @@ help: dep-gawk
 	@ echo ""
 
 
-# Helper Mehtods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Helper Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 dep-gawk:
 	@ if [ -z "$(shell command -v gawk)" ]; then  \
 		if [ -x /usr/local/bin/brew ]; then $(MAKE) _brew_gawk_install; exit 0; fi; \
@@ -111,21 +111,21 @@ dep-gawk:
 	fi
 
 _brew_gawk_install:
-	@ echo "Instaling gawk using brew... "
+	@ echo "Installing gawk using brew... "
 	@ brew install gawk --quiet
 	@ echo "done"
 
 _ubuntu_gawk_install:
-	@ echo "Instaling gawk using apt-get... "
+	@ echo "Installing gawk using apt-get... "
 	@ apt-get -q install gawk -y
 	@ echo "done"
 
 _alpine_gawk_install:
-	@ echo "Instaling gawk using yum... "
+	@ echo "Installing gawk using yum... "
 	@ apk add --update --no-cache gawk
 	@ echo "done"
 
 _centos_gawk_install:
-	@ echo "Instaling gawk using yum... "
+	@ echo "Installing gawk using yum... "
 	@ yum install -q -y gawk;
 	@ echo "done"

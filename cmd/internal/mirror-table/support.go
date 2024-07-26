@@ -88,7 +88,7 @@ func formArgs(v checker.Violation, isAlt bool) string {
 	return strings.Join(a, ", ")
 }
 
-// form returens
+// form returns
 func formReturns(ret []string) string {
 	if len(ret) == 0 {
 		return ""

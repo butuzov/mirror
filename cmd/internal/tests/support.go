@@ -84,7 +84,7 @@ func QuoteRegexp(s string) string {
 	return str.String()
 }
 
-func GenReturnelements(n int) string {
+func GenReturnElements(n int) string {
 	var ret []byte
 	for i := 0; i < n; i++ {
 		ret = append(ret, '_')
@@ -171,7 +171,7 @@ func generateTests(pkgName string, list []checker.Violation) []string {
 
 				templates.ExecuteTemplate(&buf, "case.tmpl", TestCase{
 					Arguments: []string{},
-					Returns:   GenReturnelements(len(test.Generate.Returns)),
+					Returns:   GenReturnElements(len(test.Generate.Returns)),
 					Package:   pkgInTest,
 					PreCond:   preCondition,
 					Func: makeFuncInline(test.Generate.Pattern,
