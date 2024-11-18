@@ -113,7 +113,7 @@ util/cert/cert.go:82:10: avoid allocations with (*regexp.Regexp).MatchString (mi
 
 ```shell
 # Update Assets (testdata/(strings|bytes|os|utf8|maphash|regexp|bufio).go)
-(task|make) generated
+(task|make) generate
 # Run Tests
 (task|make) tests
 # Lint Code
