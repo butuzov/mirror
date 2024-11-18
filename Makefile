@@ -52,7 +52,7 @@ tests-summary: bin/tparse
 lints: ## Run golangci-lint
 lints: bin/golangci-lint
 lints:
-	golangci-lint run --no-config ./... --skip-dirs "^(cmd|testdata)"
+	golangci-lint run --no-config ./... --exclude-dirs "^(cmd|testdata)"
 
 
 cover: ## Run Coverage
@@ -71,8 +71,8 @@ bin/tparse: INSTALL_URL=github.com/mfridman/tparse@v0.13.2
 bin/tparse:
 	$(call install_go_bin, tparse, $(INSTALL_URL))
 
-bin/golangci-lint: ## Installs golangci-lint@v1.55.2 (if not exists)
-bin/golangci-lint: INSTALL_URL=github.com/golangci/golangci-lint@v1.55.2
+bin/golangci-lint: ## Installs golangci-lint@v1.62.0 (if not exists)
+bin/golangci-lint: INSTALL_URL=github.com/golangci/golangci-lint@v1.62.0
 bin/golangci-lint:
 	$(call install_go_bin, golangci-lint, $(INSTALL_URL))
 
