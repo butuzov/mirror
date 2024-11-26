@@ -10,7 +10,8 @@ endef
 
 # Generate Artifacts ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 generate: ## Generate Assets
-	$(MAKE)
+	$(MAKE) generate-tests
+	$(MAKE) generate-mirror-table
 
 generate-tests: ## Generates Assets at testdata
 	go run ./cmd/internal/tests/ "$(PWD)/testdata"
