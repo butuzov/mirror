@@ -25,6 +25,7 @@
 | `func bytes.LastIndexFunc([]byte, func(rune) bool) int` | `func strings.LastIndexFunc(string, func(rune) bool) int` |
 | `func bytes.NewBuffer([]byte) *bytes.Buffer` | `func bytes.NewBufferString(string) *bytes.Buffer` |
 | `func (*httptest.ResponseRecorder) Write([]byte) (int, error)` | `func (*httptest.ResponseRecorder) WriteString(string) (int, error)` |
+| `func maphash.Bytes([]byte) uint64` | `func maphash.String(string) uint64` |
 | `func (*maphash.Hash) Write([]byte) (int, error)` | `func (*maphash.Hash) WriteString(string) (int, error)` |
 | `func (*os.File) Write([]byte) (int, error)` | `func (*os.File) WriteString(string) (int, error)` |
 | `func regexp.Match(string, []byte) (bool, error)` | `func regexp.MatchString(string, string) (bool, error)` |

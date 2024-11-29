@@ -11,6 +11,66 @@ import (
 
 func main_maphash() {
 	{
+		
+		_ = maphash.Bytes(maphash.MakeSeed(), []byte("foobar")) // want `avoid allocations with maphash\.String`
+	}
+
+	{
+		
+		_ = maphash.Bytes(maphash.MakeSeed(), []byte{'f','o','o','b','a','r'}) 
+	}
+
+	{
+		
+		_ = Bytes(maphash.MakeSeed(), []byte("foobar")) // want `avoid allocations with maphash\.String`
+	}
+
+	{
+		
+		_ = Bytes(maphash.MakeSeed(), []byte{'f','o','o','b','a','r'}) 
+	}
+
+	{
+		
+		_ = pkg.Bytes(maphash.MakeSeed(), []byte("foobar")) // want `avoid allocations with maphash\.String`
+	}
+
+	{
+		
+		_ = pkg.Bytes(maphash.MakeSeed(), []byte{'f','o','o','b','a','r'}) 
+	}
+
+	{
+		
+		_ = maphash.String(maphash.MakeSeed(), string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with maphash\.Bytes`
+	}
+
+	{
+		
+		_ = maphash.String(maphash.MakeSeed(), "foobar") 
+	}
+
+	{
+		
+		_ = String(maphash.MakeSeed(), string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with maphash\.Bytes`
+	}
+
+	{
+		
+		_ = String(maphash.MakeSeed(), "foobar") 
+	}
+
+	{
+		
+		_ = pkg.String(maphash.MakeSeed(), string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with maphash\.Bytes`
+	}
+
+	{
+		
+		_ = pkg.String(maphash.MakeSeed(), "foobar") 
+	}
+
+	{
 		h := maphash.Hash{}
 		_,_ = h.Write([]byte("foobar")) // want `avoid allocations with \(\*maphash\.Hash\)\.WriteString`
 	}
