@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 
@@ -80,7 +81,7 @@ func formArgs(v checker.Violation, isAlt bool) string {
 				f := strings.Split(i, "{")
 				a = append(a, strings.TrimSpace(f[0]))
 			default:
-				fmt.Println(">", i)
+				fmt.Fprintln(os.Stderr, ">", i)
 			}
 		}
 	}

@@ -11,63 +11,63 @@ import (
 
 func main_maphash() {
 	{
-		seed := maphash.MakeSeed()
-		_ = seed.Bytes(seed, []byte("foobar")) // want `avoid allocations with maphash\.String`
+		
+		_ = maphash.Bytes(maphash.MakeSeed(), []byte("foobar")) // want `avoid allocations with maphash\.String`
 	}
 
 	{
-		seed := maphash.MakeSeed()
-		_ = seed.Bytes(seed, []byte{'f','o','o','b','a','r'}) 
+		
+		_ = maphash.Bytes(maphash.MakeSeed(), []byte{'f','o','o','b','a','r'}) 
 	}
 
 	{
-		seed := MakeSeed()
-		_ = seed.Bytes(seed, []byte("foobar")) // want `avoid allocations with maphash\.String`
+		
+		_ = Bytes(maphash.MakeSeed(), []byte("foobar")) // want `avoid allocations with maphash\.String`
 	}
 
 	{
-		seed := MakeSeed()
-		_ = seed.Bytes(seed, []byte{'f','o','o','b','a','r'}) 
+		
+		_ = Bytes(maphash.MakeSeed(), []byte{'f','o','o','b','a','r'}) 
 	}
 
 	{
-		seed := pkg.MakeSeed()
-		_ = seed.Bytes(seed, []byte("foobar")) // want `avoid allocations with maphash\.String`
+		
+		_ = pkg.Bytes(maphash.MakeSeed(), []byte("foobar")) // want `avoid allocations with maphash\.String`
 	}
 
 	{
-		seed := pkg.MakeSeed()
-		_ = seed.Bytes(seed, []byte{'f','o','o','b','a','r'}) 
+		
+		_ = pkg.Bytes(maphash.MakeSeed(), []byte{'f','o','o','b','a','r'}) 
 	}
 
 	{
-		seed := maphash.MakeSeed()
-		_ = seed.String(seed, string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with maphash\.Bytes`
+		
+		_ = maphash.String(maphash.MakeSeed(), string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with maphash\.Bytes`
 	}
 
 	{
-		seed := maphash.MakeSeed()
-		_ = seed.String(seed, "foobar") 
+		
+		_ = maphash.String(maphash.MakeSeed(), "foobar") 
 	}
 
 	{
-		seed := MakeSeed()
-		_ = seed.String(seed, string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with maphash\.Bytes`
+		
+		_ = String(maphash.MakeSeed(), string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with maphash\.Bytes`
 	}
 
 	{
-		seed := MakeSeed()
-		_ = seed.String(seed, "foobar") 
+		
+		_ = String(maphash.MakeSeed(), "foobar") 
 	}
 
 	{
-		seed := pkg.MakeSeed()
-		_ = seed.String(seed, string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with maphash\.Bytes`
+		
+		_ = pkg.String(maphash.MakeSeed(), string([]byte{'f','o','o','b','a','r'})) // want `avoid allocations with maphash\.Bytes`
 	}
 
 	{
-		seed := pkg.MakeSeed()
-		_ = seed.String(seed, "foobar") 
+		
+		_ = pkg.String(maphash.MakeSeed(), "foobar") 
 	}
 
 	{

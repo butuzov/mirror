@@ -13,9 +13,8 @@ var (
 			AltCaller: "String",
 
 			Generate: &checker.Generate{
-				PreCondition: `seed := maphash.MakeSeed()`,
-				Pattern:      `Bytes(seed, $0)`,
-				Returns:      []string{"uint64"},
+				Pattern: `Bytes(maphash.MakeSeed(), $0)`,
+				Returns: []string{"uint64"},
 			},
 		},
 		{ // maphash.String
@@ -27,9 +26,8 @@ var (
 			AltCaller: "Bytes",
 
 			Generate: &checker.Generate{
-				PreCondition: `seed := maphash.MakeSeed()`,
-				Pattern:      `String(seed, $0)`,
-				Returns:      []string{"uint64"},
+				Pattern: `String(maphash.MakeSeed(), $0)`,
+				Returns: []string{"uint64"},
 			},
 		},
 	}
