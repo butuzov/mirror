@@ -17,6 +17,7 @@ func main() {
 		mirror.BytesBufferMethods,
 		mirror.BytesFunctions,
 		mirror.HTTPTestMethods,
+		mirror.MaphashFunctions,
 		mirror.MaphashMethods,
 		mirror.OsFileMethods,
 		mirror.RegexpFunctions,

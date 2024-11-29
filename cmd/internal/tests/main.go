@@ -61,6 +61,7 @@ func main() {
 	{ // hash/maphash
 
 		tests := []string{}
+		tests = append(tests, generateTests("maphash", mirror.MaphashFunctions)...)
 		tests = append(tests, generateTests("maphash", mirror.MaphashMethods)...)
 
 		err := GenerateTestFile(filepath.Join(testdata, "maphash.go"), "hash/maphash", tests)
