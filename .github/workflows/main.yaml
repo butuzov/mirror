@@ -18,20 +18,12 @@ jobs:
         go: [oldstable, stable]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: ${{ matrix.go }}
-
-      - uses: actions/cache@v4
-        if: ${{ !env.ACT }}
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ matrix.golang }}-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-${{ matrix.golang }}-
 
       - run: make build
       - run: make tests
@@ -46,7 +38,7 @@ jobs:
           COVERALLS_TOKEN: ${{ secrets.github_token }}
         run: goveralls -coverprofile=coverage.cov -service=github
 
-  GolangCI_Linter:
+  GolangCILinter:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -54,5 +46,3 @@ jobs:
         uses: golangci/golangci-lint-action@v9
         with:
           version: latest
-          skip-cache: true
-          args: --exclude-dirs "^(cmd|testdata)"
