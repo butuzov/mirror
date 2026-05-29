@@ -109,7 +109,7 @@ func (c *Checker) callConverts(ce *ast.CallExpr) bool {
 
 // register violations.
 func (c *Checker) register(violations []Violation) {
-	for _, v := range violations { // nolint: gocritic
+	for _, v := range violations { //nolint: gocritic
 		c.Violations = append(c.Violations, v)
 		if len(v.Struct) > 0 {
 			c.registerIdxPer(v.Package + "." + v.Struct)
