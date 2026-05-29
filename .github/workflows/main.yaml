@@ -15,10 +15,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        go:
-          - "1.24"
-          - "1.25"
-          - "1.26"
+        go: [oldstable, stable]
 
     steps:
       - uses: actions/checkout@v4
@@ -40,11 +37,11 @@ jobs:
       - run: make tests
 
       - name: Install goveralls
-        if: matrix.go == '1.26'
+        if: matrix.go == 'stable'
         run: go install github.com/mattn/goveralls@latest
 
       - name: Coverage - Sending Report to Coveral
-        if: matrix.go == '1.26'
+        if: matrix.go == 'stable'
         env:
           COVERALLS_TOKEN: ${{ secrets.github_token }}
         run: goveralls -coverprofile=coverage.cov -service=github
@@ -52,9 +49,9 @@ jobs:
   GolangCI_Linter:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: lint
-        uses: golangci/golangci-lint-action@v6.1.1
+        uses: golangci/golangci-lint-action@v9
         with:
           version: latest
           skip-cache: true
