@@ -36,7 +36,7 @@ func main() {
 		tests = append(tests, generateTests("regexp", mirror.RegexpFunctions)...)
 		tests = append(tests, generateTests("regexp", mirror.RegexpRegexpMethods)...)
 
-		GenerateTestFile(filepath.Join(testdata, "regexp.go"), "regexp", tests)
+		_ = GenerateTestFile(filepath.Join(testdata, "regexp.go"), "regexp", tests)
 	}
 
 	{ // strings

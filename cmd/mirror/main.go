@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/butuzov/mirror"
 	"golang.org/x/tools/go/analysis/singlechecker"
+
+	"github.com/butuzov/mirror"
 )
 
 func main() {

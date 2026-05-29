@@ -158,18 +158,19 @@ func generateTests(pkgName string, list []checker.Violation) []string {
 				pkgInTest := pkg
 				preCondition := test.Generate.PreCondition
 				if test.Generate.PreCondition != "" {
-					pkgInTest = strings.Trim(strings.Split(test.Generate.PreCondition, ":=")[0], " ")
+					pkgInTest = strings.Trim(strings.Split(
+						test.Generate.PreCondition, ":=")[0], " ")
 
 					alt := pkg + "."
 					if strings.Trim(pkg, " ") == "" {
 						alt = ""
 					}
 
-					preCondition = strings.Replace(preCondition, pkgName+".", alt, -1)
+					preCondition = strings.ReplaceAll(preCondition, pkgName+".", alt)
 
 				}
 
-				templates.ExecuteTemplate(&buf, "case.tmpl", TestCase{
+				_ = templates.ExecuteTemplate(&buf, "case.tmpl", TestCase{
 					Arguments: []string{},
 					Returns:   GenReturnElements(len(test.Generate.Returns)),
 					Package:   pkgInTest,

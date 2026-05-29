@@ -82,7 +82,8 @@ func TestImports(t *testing.T) {
 
 			// assert
 			if len(testImports["a.go"]) != test.importsLen {
-				t.Errorf("Imports len not match: got(%d) vs want(%d)", len(testImports["a.go"]), test.importsLen)
+				t.Errorf("Imports len not match: got(%d) vs want(%d)",
+					len(testImports["a.go"]), test.importsLen)
 			}
 
 			for k, v := range test.hasImports {
