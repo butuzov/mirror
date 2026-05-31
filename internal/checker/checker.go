@@ -141,7 +141,7 @@ func WrapType(info *types.Info) func(node ast.Expr) string {
 func WrapPrint(fSet *token.FileSet) func(ast.Node) []byte {
 	return func(node ast.Node) []byte {
 		var buf bytes.Buffer
-		printer.Fprint(&buf, fSet, node)
+		_ = printer.Fprint(&buf, fSet, node)
 		return buf.Bytes()
 	}
 }

@@ -31,20 +31,6 @@ func variate(variance string, oneIsString bool) []string {
 	for i := 0; i < len(variance); i++ {
 		var input string
 
-		// if out argument is in string we gonna take argument that is
-		if oneIsString {
-			input = `"foobar"`
-		} else {
-			input = `[]byte{'f','o','o','b','a','r'}`
-		}
-
-		if oneIsString && (variance[i] == '1') {
-			input = fmt.Sprintf(`%s(%s)`, "[]byte", input)
-		}
-		if !oneIsString && (variance[i] == '0') {
-			input = fmt.Sprintf(`%s(%s)`, "string", input)
-		}
-
 		if oneIsString {
 			// looking for string
 			if variance[i] == '1' {
