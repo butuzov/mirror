@@ -1,0 +1,20 @@
+name: mirror-linter
+description: Runs the Go's mirror linter that checks string/[]byte performance busts
+author: "@butuzov"
+
+inputs:
+  with-tests:
+    required: false
+    description: Also check tests...
+    default: false
+
+runs:
+  using: docker
+  image: Dockerfile
+  args:
+    - '--with-tests'
+    - ./...
+
+branding:
+  icon: 'check-circle'
+  color: 'blue'
