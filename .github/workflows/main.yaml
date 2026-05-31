@@ -40,7 +40,7 @@ jobs:
           COVERALLS_TOKEN: ${{ secrets.github_token }}
         run: goveralls -coverprofile=coverage.cov -service=github
 
-  GolangCILinter:
+  Linter:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
