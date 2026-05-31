@@ -106,10 +106,10 @@ func GenerateTestFile(file string, pkgName string, Tests []string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck
 
 	w := bufio.NewWriter(f)
-	defer w.Flush()
+	defer w.Flush() //nolint: errcheck
 
 	return templates.ExecuteTemplate(w, "file.tmpl", struct {
 		Package string
